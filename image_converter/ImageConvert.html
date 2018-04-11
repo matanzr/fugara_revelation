@@ -1,0 +1,53 @@
+<html>
+    <canvas id="canvas"></canvas>
+    <script>
+        var imageRGB = []
+        var img = new Image();
+
+        img.src = './futuristic1.png';
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+            img.style.display = 'none';
+
+            var str = "{";
+
+
+
+            for (var i=0; i < img.height; i++) {
+                str += "{"
+                var rowRGB = []
+                var row = ctx.getImageData(0, i, img.width, 1).data;                
+                for (var j=0; j < row.length; j++) {
+                    if (j%4 != 3) rowRGB.push(row[j]);
+                }
+                str += rowRGB.join(",") + "},\n";
+            }
+            
+            console.log( str +"}");
+        };
+        var color = document.getElementById('color');
+
+        
+        
+
+        for (var i=0; i < img.width; i++) {
+            for (var j=0; j < img.height; j++) {
+                
+            }
+        }
+        
+        // function pick(event) {
+        //     var x = event.layerX;
+        //     var y = event.layerY;
+        //     var pixel = 
+        //     var data = pixel.data;
+        //     var rgba = 'rgba(' + data[0] + ', ' + data[1] +
+        //                 ', ' + data[2] + ', ' + (data[3] / 255) + ')';
+        //     color.style.background =  rgba;
+        //     color.textContent = rgba;
+        // }
+        
+    </script>
+</html>

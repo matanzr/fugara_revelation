@@ -1,0 +1,89 @@
+<html>
+    <canvas id="canvas"  width="288" height="288"></canvas>
+    <canvas id="canvas2"></canvas>
+    <script>
+        var imageRGB = []
+        var img = new Image();
+
+        var reproject = [];
+
+        img.src = './testcircle.png';
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        
+        var canvas2 = document.getElementById('canvas2');
+        var res_ctx = canvas2.getContext('2d');
+
+        var targetImageColumns = 400;
+        var myImageData;        
+
+
+
+        img.onload = function() {            
+            ctx.drawImage(img, 0, 0);
+            img.style.display = 'none';            
+            var img_data = ctx.getImageData(0,0,img.width,img.height).data;
+
+            var imageDiameter = img.width;
+            myImageData = res_ctx.createImageData(imageDiameter, targetImageColumns);
+            var new_data = myImageData.data;
+            var i =0, theta = 0;
+            var theta_increment = 2 * Math.PI / targetImageColumns;
+            for (var j=0; j < targetImageColumns; j++) {
+                console.log(j + " / " + targetImageColumns)
+                var dx = Math.cos(theta);
+                var dy = Math.sin(theta);            
+
+                for (var k=0; k < imageDiameter/2; k++) {                      
+                    var xk = k * dx + img.width / 2;
+                    var yk = k * dy + img.height / 2;      
+                    
+                    if (xk > img.width || yk > img.height || xk < 0 || yk < 0) {
+                        console.error("Assert: Trying to sample pixels out of image");
+                    }
+
+                    var cur_data = ctx.getImageData(xk,yk,1,1).data;
+                    new_data[i] = cur_data[0];
+                    new_data[i + 1] = cur_data[1]; // green
+                    new_data[i + 2] = cur_data[2]; // blue
+                    new_data[i + 3] = cur_data[3]; // alpha
+
+                    // var index =  ~~(xk + yk * img.height);
+
+                    // new_data[i] = img_data[index*4];
+                    // new_data[i + 1] = img_data[index*4+1]; // green
+                    // new_data[i + 2] = img_data[index*4+2]; // blue
+                    // new_data[i + 3] = img_data[index*4+3]; // alpha                      
+
+                    i+=4;                                         
+                }
+                theta += theta_increment; 
+            }                       
+            
+            ctx.putImageData(myImageData, 0, 0);
+            
+        };
+        var color = document.getElementById('color');
+
+        
+        
+
+        for (var i=0; i < img.width; i++) {
+            for (var j=0; j < img.height; j++) {
+                
+            }
+        }
+        
+        // function pick(event) {
+        //     var x = event.layerX;
+        //     var y = event.layerY;
+        //     var pixel = 
+        //     var data = pixel.data;
+        //     var rgba = 'rgba(' + data[0] + ', ' + data[1] +
+        //                 ', ' + data[2] + ', ' + (data[3] / 255) + ')';
+        //     color.style.background =  rgba;
+        //     color.textContent = rgba;
+        // }
+        
+    </script>
+</html>
