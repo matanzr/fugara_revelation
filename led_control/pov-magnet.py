@@ -8,13 +8,14 @@
 
 from PIL import Image
 from dotstar import Adafruit_DotStar
+from magnet_sensor import MagnetButton
 
-filename  = "fugara_hello.png" # Image file to load
+filename  = "test_cycle.png" # Image file to load
 
 # Here's how to control the strip from any two GPIO pins:
 datapin   = 10
 clockpin  = 11
-strip     = Adafruit_DotStar(0, datapin, clockpin)
+strip     = Adafruit_DotStar(0, datapin, clockpin, 12000000)
 # Notice the number of LEDs is set to 0.  This is on purpose...we're asking
 # the DotStar module to NOT allocate any memory for this strip...we'll handle
 # our own allocation and conversion and will feed it 'raw' data.
@@ -53,6 +54,21 @@ column = [0 for x in range(width)]
 for x in range(width):
 	column[x] = bytearray(height * 4)
 
+clear = bytearray(144 * 4)
+for y in range(144):
+    clear[y*4] = 0xFF
+    clear[y*4+1] = 0
+    clear[y*4+2] = 0
+    clear[y*4+3] = 0
+
+full = bytearray(144 * 4)
+for y in range(72):
+    full[y*4] = 0xFF
+    full[y*4+1] = 70
+    full[y*4+2] = 70
+    full[y*4+3] = 70  
+    
+
 # Convert entire RGB image into column-wise BGR bytearray list.
 # The image-paint.py example proceeds in R/G/B order because it's counting
 # on the library to do any necessary conversion.  Because we're preparing
@@ -63,12 +79,24 @@ for x in range(width):          # For each column of image...
 		value             = pixels[x, y]    # Read pixel in image
 		y4                = y * 4           # Position in raw buffer
 		column[x][y4]     = 0xFF            # Pixel start marker
-		column[x][y4 + rOffset] = gamma[value[0]] # Gamma-corrected R
-		column[x][y4 + gOffset] = gamma[value[1]] # Gamma-corrected G
-		column[x][y4 + bOffset] = gamma[value[2]] # Gamma-corrected B
+		column[x][y4 + rOffset] = int(0.3 * gamma[value[0]]) # Gamma-corrected R
+		column[x][y4 + gOffset] = int(0.3 * gamma[value[1]]) # Gamma-corrected G
+		column[x][y4 + bOffset] = int(0.3 * gamma[value[2]]) # Gamma-corrected B
 
 print( "Displaying...")
-while True:                            # Loop forever
 
-	for x in range(width):         # For each column of image...
-		strip.show(column[width-x-1])  # Write raw data to strip
+count = [0]
+def sync_magnet(counter):
+    a = counter
+    def magnet_cbk(m):
+        a[0] = 0        
+    return magnet_cbk
+
+magnet = MagnetButton(27)
+magnet.when_magnet = sync_magnet(count)
+while True:                            # Loop forever
+    while (count[0] < width):
+        strip.show(column[count[0]])
+        count[0] = count[0] + 1   
+	# for x in range(width):         # For each column of image...
+	# 	strip.show(column[width-x-1])  # Write raw data to strip
