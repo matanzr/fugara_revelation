@@ -1,13 +1,13 @@
 <html>
     <canvas id="canvas"  width="288" height="288"></canvas>
-    <canvas id="canvas2"></canvas>
+    <canvas id="canvas2" width="288" height="288"></canvas>
     <script>
         var imageRGB = []
         var img = new Image();
 
         var reproject = [];
 
-        img.src = './testcircle.png';
+        img.src = './fugaraLEDTest2.png';
         var canvas = document.getElementById('canvas');
         var ctx = canvas.getContext('2d');
         
@@ -29,14 +29,13 @@
             var new_data = myImageData.data;
             var i =0, theta = 0;
             var theta_increment = 2 * Math.PI / targetImageColumns;
-            for (var j=0; j < targetImageColumns; j++) {
-                console.log(j + " / " + targetImageColumns)
+            for (var j=0; j < targetImageColumns; j++) {                
                 var dx = Math.cos(theta);
                 var dy = Math.sin(theta);            
 
-                for (var k=0; k < imageDiameter/2; k++) {                      
-                    var xk = k * dx + img.width / 2;
-                    var yk = k * dy + img.height / 2;      
+                for (var k=0; k < imageDiameter; k++) {                      
+                    var xk = (-imageDiameter/2 + k) * dx + img.width / 2;
+                    var yk = (-imageDiameter/2 + k) * dy + img.height / 2;      
                     
                     if (xk > img.width || yk > img.height || xk < 0 || yk < 0) {
                         console.error("Assert: Trying to sample pixels out of image");
@@ -46,21 +45,14 @@
                     new_data[i] = cur_data[0];
                     new_data[i + 1] = cur_data[1]; // green
                     new_data[i + 2] = cur_data[2]; // blue
-                    new_data[i + 3] = cur_data[3]; // alpha
-
-                    // var index =  ~~(xk + yk * img.height);
-
-                    // new_data[i] = img_data[index*4];
-                    // new_data[i + 1] = img_data[index*4+1]; // green
-                    // new_data[i + 2] = img_data[index*4+2]; // blue
-                    // new_data[i + 3] = img_data[index*4+3]; // alpha                      
+                    new_data[i + 3] = cur_data[3]; // alpha                    
 
                     i+=4;                                         
                 }
                 theta += theta_increment; 
             }                       
             
-            ctx.putImageData(myImageData, 0, 0);
+            res_ctx.putImageData(myImageData, 0, 0);
             
         };
         var color = document.getElementById('color');
