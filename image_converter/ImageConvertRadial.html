@@ -1,6 +1,6 @@
 <html>
     <canvas id="canvas"  width="288" height="288"></canvas>
-    <canvas id="canvas2" width="400" height="400"></canvas>
+    <canvas id="canvas2" width="400" height="144"></canvas>
     <script>
         var imageRGB = []
         var img = new Image();
@@ -25,17 +25,19 @@
             var img_data = ctx.getImageData(0,0,img.width,img.height).data;
 
             var imageDiameter = img.width;
-            myImageData = res_ctx.createImageData(targetImageColumns, imageDiameter);
+            var target_imageDiameter = 144;
+            myImageData = res_ctx.createImageData(targetImageColumns, target_imageDiameter);
             var new_data = myImageData.data;
             var theta = 0;
             var theta_increment = 2 * Math.PI / targetImageColumns;
             for (var j=0; j < targetImageColumns; j++) {                
                 var dx = Math.cos(theta);
-                var dy = Math.sin(theta);            
+                var dy = Math.sin(theta);        
+                var dd = imageDiameter / target_imageDiameter;    
 
-                for (var k=0; k < imageDiameter; k++) {                      
-                    var xk = (-imageDiameter/2 + k) * dx + img.width / 2;
-                    var yk = (-imageDiameter/2 + k) * dy + img.height / 2;      
+                for (var k=0; k < target_imageDiameter; k++) {                      
+                    var xk = dd*(-target_imageDiameter/2 + k) * dx + img.width / 2;
+                    var yk = dd*(-target_imageDiameter/2 + k) * dy + img.height / 2;      
                     
                     if (xk > img.width || yk > img.height || xk < 0 || yk < 0) {
                         console.error("Assert: Trying to sample pixels out of image");
