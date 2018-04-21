@@ -37,5 +37,6 @@ if __name__ == "__main__":
     button = MagnetButton(27)
 
     while True:
+        print button.last_k
         print button.estimated_rpm()
         time.sleep(1)

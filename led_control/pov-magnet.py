@@ -9,6 +9,7 @@
 from PIL import Image
 from dotstar import Adafruit_DotStar
 from magnet_sensor import MagnetButton
+import time
 
 filename  = "test_cycle.png" # Image file to load
 
@@ -25,9 +26,9 @@ strip     = Adafruit_DotStar(0, datapin, clockpin, 12000000)
 # Additionally, byte 0 of each 4-byte pixel is always 0xFF, so the RGB
 # offsets are always in range 1-3.
 # Here's the offsets for current (2015+) strips:
-rOffset = 1
-gOffset = 2
-bOffset = 3
+rOffset = 3
+gOffset = 1
+bOffset = 2
 # For older strips, change values to 3, 1, 2
 # This is ONLY necessary because we're raw-writing; for normal setPixelColor
 # use, offsets can be changed with the 'order' keyword (see strandtest.py).
@@ -79,24 +80,32 @@ for x in range(width):          # For each column of image...
 		value             = pixels[x, y]    # Read pixel in image
 		y4                = y * 4           # Position in raw buffer
 		column[x][y4]     = 0xFF            # Pixel start marker
-		column[x][y4 + rOffset] = int(0.3 * gamma[value[0]]) # Gamma-corrected R
-		column[x][y4 + gOffset] = int(0.3 * gamma[value[1]]) # Gamma-corrected G
-		column[x][y4 + bOffset] = int(0.3 * gamma[value[2]]) # Gamma-corrected B
+		column[x][y4 + rOffset] = int(0.12 * gamma[value[0]]) # Gamma-corrected R
+		column[x][y4 + gOffset] = int(0.12 * gamma[value[1]]) # Gamma-corrected G
+		column[x][y4 + bOffset] = int(0.12 * gamma[value[2]]) # Gamma-corrected B
 
 print( "Displaying...")
 
-count = [0]
+count = [0, 0.2, 0]
 def sync_magnet(counter):
     a = counter
     def magnet_cbk(m):
         a[0] = 0        
+        a[1] = m.estimated_rpm()
+        a[2] = time.time()
     return magnet_cbk
 
 magnet = MagnetButton(27)
 magnet.when_magnet = sync_magnet(count)
+
 while True:                            # Loop forever
+    last_update = time.time()
     while (count[0] < width):
-        strip.show(column[count[0]])
-        count[0] = count[0] + 1   
+        c = int(width * (time.time() - count[2]) / count[1])
+        if c >= width: c = 0
+        strip.show(column[c])
+        # count[0] = count[0] + 1   
+        last_update = time.time()
+
 	# for x in range(width):         # For each column of image...
 	# 	strip.show(column[width-x-1])  # Write raw data to strip
