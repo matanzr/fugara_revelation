@@ -74,7 +74,7 @@ class PovFan:
                 return magnet_cbk
 
             magnet = MagnetButton(27)
-            magnet.when_magnet = sync_magnet(count)
+            magnet.when_magnet = sync_magnet(timing)
 
             while end_time > timing["last_update"]:
                 c = int(self.width * (time.time() - timing["last_update"]) / timing["lapse_time"])
@@ -83,7 +83,7 @@ class PovFan:
                 if c >= self.width: 
                     c = 0
 
-                strip.show(self.column[c])        
+                self.strip.show(self.column[c])        
 
         else:
             while end_time > timing["last_update"]: 
