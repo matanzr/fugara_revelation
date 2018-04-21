@@ -42,10 +42,10 @@
                     }
 
                     var cur_data = ctx.getImageData(xk,yk,1,1).data;
-                    new_data[4*(j*targetImageColumns + k)] = cur_data[0];
-                    new_data[4*(j*targetImageColumns + k) + 1] = cur_data[1]; // green
-                    new_data[4*(j*targetImageColumns + k) + 2] = cur_data[2]; // blue
-                    new_data[4*(j*targetImageColumns + k) + 3] = cur_data[3]; // alpha                                                    
+                    new_data[4*(k*targetImageColumns + j)] = cur_data[0];
+                    new_data[4*(k*targetImageColumns + j) + 1] = cur_data[1]; // green
+                    new_data[4*(k*targetImageColumns + j) + 2] = cur_data[2]; // blue
+                    new_data[4*(k*targetImageColumns + j) + 3] = cur_data[3]; // alpha                                                    
                 }
                 theta += theta_increment; 
             }                       
