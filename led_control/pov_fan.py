@@ -83,7 +83,9 @@ class PovFan:
                 if c >= self.width: 
                     c = 0
 
-                self.strip.show(self.column[c])        
+                self.strip.show(self.column[c])    
+
+            magnet.close()    
 
         else:
             while end_time > timing["last_update"]: 

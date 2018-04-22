@@ -56,6 +56,7 @@ class FanClient:
         path = name
         print "loading sequence: ", name
         # self.fan.load_sequence(path)
+        self.fan.load_sequence("test_images/fugara_test_image_radial.png") 
 
         self.state = "loaded"
 
@@ -86,7 +87,10 @@ class FanClient:
 
 if __name__ == "__main__":
     client = FanClient("test_fan")
-    client.run()
+    # client.run()
 
-    # client.load_sequence("test_images/fugara_test_image_radial.png")
-    # client.play_fan(5)
+    client.load_sequence("test_images/fugara_test_image_radial.png")
+    client.play_fan(5)
+
+    client.load_sequence("test_images/fugara_test_image_radial.png")
+    client.play_fan(5)
