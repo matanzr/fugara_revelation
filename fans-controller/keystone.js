@@ -8,7 +8,8 @@ var keystone = require('keystone');
 keystone.init({
 	'name': 'Fans Controller',
 	'brand': 'Fans Controller',
-
+	'logger': false,
+	
 	'less': 'public',
 	'static': 'public',
 	'favicon': 'public/favicon.ico',
@@ -35,3 +36,4 @@ keystone.set('nav', {
 });
 
 keystone.start();
+require('./services/index.js');

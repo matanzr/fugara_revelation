@@ -8,15 +8,16 @@ var Types = keystone.Field.Types;
 var Fan = new keystone.List('Fan');
 
 Fan.add({
-	name: { type: String, required: false, index: false },
-	address: { type: String, required: false, index: false },
-	state: { default: 'offline', type: Types.Select, options: ['offline', 'idle', 'loading', 'loaded', 'drawing'] },
 	fanId: { type: String, required: false, index: true },
+	address: { type: String, required: false, index: false },
+	lastUpdate: { type: Types.Datetime, init: Date.now },
+	state: { default: 'offline', type: Types.Select, options: ['offline', 'stopped', 'loading', 'loaded', 'drawing'] },
+	asset: { type: String, required: false, index: true },
 });
 
 
 /**
  * Registration
  */
-Fan.defaultColumns = 'name, fanId, address, state';
+Fan.defaultColumns = 'fanId, address, state, asset, lastUpdate';
 Fan.register();

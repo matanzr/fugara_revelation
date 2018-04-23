@@ -8,16 +8,21 @@ var Types = keystone.Field.Types;
 var ServerSettings = new keystone.List('ServerSettings');
 
 ServerSettings.add({
-	animation: { type: String, required: false, index: false },
-	state: { default: 'fans_idle', type: Types.Select, options: ['fans_idle', 'fans_loading', 'fans_drawing'] },
+	currentState: { init: 'fans_stopped', type: Types.Select, options: ['fans_stopped', 'fans_loading', 'fans_drawing'] },
+	currentAnimation: { type: String, required: false, index: false },
+	currentAnimationDuration: { type: Number, required: false, index: false },
+	currentAnimationStartingTime: { type: Types.Datetime, init: Date.now },
+	nextAnimation: { type: String, required: false, index: false },
+	animations: { type: Types.TextArray },
+	durations: { type: Types.NumberArray },
 });
 
-// ServerSettings.schema.pre('update', next => {
-// 	var modified_paths = this.modifiedPaths();
-// 	console.log(modified_paths);
-// 	next();
-// });
-
+ServerSettings.schema.pre('validate', function (next) {
+	if (this.animations.length !== this.durations.length) {
+		return next(new Error('Animations and durations array aren\'t the same size'));
+	}
+	next();
+  });
 
 /**
  * Registration

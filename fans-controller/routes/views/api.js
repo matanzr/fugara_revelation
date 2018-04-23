@@ -24,9 +24,9 @@ exports = module.exports = {
 			if (ip.substr(0, 7) === '::ffff:') {
 				ip = ip.substr(7);
 			}
-
-			fan.state = 'idle';
+			fan.state = 'stopped';
 			fan.address = ip;
+			fan.lastUpdate = Date.now();
 			fan.save((err, saveResult) => {
 				if (err) {
 					return res.json({ error: err });
@@ -37,43 +37,46 @@ exports = module.exports = {
 	},
 
 	GetAction: function (req, res) {
-		console.log('Get Action: ' + JSON.stringify(req.body));	
+		// console.log('Get Action: ' + JSON.stringify(req.body));	
 		let fanId = req.body.fanId;
 		let state = req.body.state;
+		let asset = req.body.asset;
 		if (!fanId || !state) {
-			return res.json({ error: 'Didn\'t get a fanId and state' });
+			return res.json({ error: 'Didn\'t get a fanId, state' });
 		}
 		Fan.model.findOne({ fanId }, (err, fan) => {
 			if (err) {
-				console.log(err);
 				return res.json({ error: err });
 			}
 			if (!fan) {
 				return res.json({ error: 'Couldn\'t find fan' });
 			}
 
-			fan.state = state; //'offline', 'idle', 'loading', 'loaded', 'drawing'
+			fan.state = state; //'offline', 'stopped', 'loading', 'loaded', 'drawing'
+			fan.asset = asset;
+			fan.lastUpdate = Date.now();
 			fan.save((err, saveResult) => {
-
 				ServerSettings.model.findOne({ }, (err, serverSettings) => {
-					Fan.model.find({}, (err, fans) => {
-						if (serverSettings.state === 'fans_idle') {
-							console.log(JSON.stringify(fans, null, 4));
-							if (areAllAtState(fans, 'idle')) {
-								serverSettings.state = 'fans_loading';
+					Fan.model.find({ state: { $ne: 'offline' } }, (err, fans) => {
+						if (serverSettings.currentState === 'fans_stopped') {
+							if (areAllAtState(fans, 'stopped')) {
+								serverSettings.currentState = 'fans_loading';
 								serverSettings.save();
 							}
-							return res.json({ status: 'success', action: 'idle' });
+							return res.json({ status: 'success', action: 'stop' });
 						}
-						else if (serverSettings.state === 'fans_loading') {
+						else if (serverSettings.currentState === 'fans_loading') {
 							if (areAllAtState(fans, 'loaded')) {
-								serverSettings.state = 'fans_drawing';
+								serverSettings.currentState = 'fans_drawing';
+								serverSettings.currentAnimation = serverSettings.nextAnimation;
+								serverSettings.currentAnimationDuration = serverSettings.durations[serverSettings.animations.indexOf(serverSettings.currentAnimation)];
+								serverSettings.currentAnimationStartingTime = Date.now();
 								serverSettings.save();
 							}
-							return res.json({ status: 'success', action: 'load', animation: serverSettings.animation });
+							return res.json({ status: 'success', action: 'load', animation: serverSettings.nextAnimation });
 						}
-						else if (serverSettings.state === 'fans_drawing') {
-							return res.json({ status: 'success', action: 'draw', animation: serverSettings.animation });
+						else if (serverSettings.currentState === 'fans_drawing') {
+							return res.json({ status: 'success', action: 'draw', animation: serverSettings.currentAnimation });
 						}
 					});
 				});
