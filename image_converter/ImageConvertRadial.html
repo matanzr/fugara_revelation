@@ -2,12 +2,24 @@
     <canvas id="canvas"  width="288" height="288"></canvas>
     <canvas id="canvas2" width="400" height="144"></canvas>
     <script>
+        var save = true;
+        function downloadURI(uri, name) {
+            var link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        }
+
         var imageRGB = []
         var img = new Image();
 
         var reproject = [];
-
-        img.src = './fugaraLEDTest2.png';
+        
+        var file_name = "seq_0193.png";
+        img.src = './sequence2/' + file_name;
         var canvas = document.getElementById('canvas');
         var ctx = canvas.getContext('2d');
         
@@ -53,29 +65,13 @@
             }                       
             
             res_ctx.putImageData(myImageData, 0, 0);
+
+            if (save) {                        
+                downloadURI(canvas2.toDataURL("image/png"), file_name);
+            }
             
         };
-        var color = document.getElementById('color');
 
-        
-        
-
-        for (var i=0; i < img.width; i++) {
-            for (var j=0; j < img.height; j++) {
-                
-            }
-        }
-        
-        // function pick(event) {
-        //     var x = event.layerX;
-        //     var y = event.layerY;
-        //     var pixel = 
-        //     var data = pixel.data;
-        //     var rgba = 'rgba(' + data[0] + ', ' + data[1] +
-        //                 ', ' + data[2] + ', ' + (data[3] / 255) + ')';
-        //     color.style.background =  rgba;
-        //     color.textContent = rgba;
-        // }
         
     </script>
 </html>
