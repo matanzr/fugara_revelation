@@ -15,3 +15,6 @@ dotstar.so: dotstar.o
 
 clean:
 	rm -f dotstar.o dotstar.so
+
+test:
+	gcc -Ofast -fomit-frame-pointer -I/opt/vc/include -L/opt/vc/lib -c dotstar.c

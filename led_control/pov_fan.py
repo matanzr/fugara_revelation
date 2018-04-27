@@ -14,6 +14,8 @@ bOffset = 1
 
 STRIP_LENGTH = 144
 
+LED_BRIGHTNESS = 0.3
+
 class PovFan:
     def __init__(self):
         datapin    = 10
@@ -55,9 +57,9 @@ class PovFan:
                 value             = pixels[x, y]    # Read pixel in image
                 y4                = y * 4           # Position in raw buffer
                 column[x][y4]     = 0xFF            # Pixel start marker
-                column[x][y4 + rOffset] = int(0.12 * gamma[value[0]]) # Gamma-corrected R
-                column[x][y4 + gOffset] = int(0.12 * gamma[value[1]]) # Gamma-corrected G
-                column[x][y4 + bOffset] = int(0.12 * gamma[value[2]]) # Gamma-corrected B
+                column[x][y4 + rOffset] = int(LED_BRIGHTNESS * gamma[value[0]]) # Gamma-corrected R
+                column[x][y4 + gOffset] = int(LED_BRIGHTNESS * gamma[value[1]]) # Gamma-corrected G
+                column[x][y4 + bOffset] = int(LED_BRIGHTNESS * gamma[value[2]]) # Gamma-corrected B
         
         self.sequence.append(column)
         self.width = width
@@ -65,10 +67,11 @@ class PovFan:
         img.close()
 
     #TODO: set sequence length
-    def load_sequence(self, sequence_path, seq_size = 1):                
-        for i in range(seq_size):
-            print "loading image ", i , " from sequnce: ", "seq_" + str(601+i).zfill(4) + ".png"
-            self.add_image(os.path.join(sequence_path, "seq_" + str(601+i).zfill(4) + ".png"))
+    def load_sequence(self, sequence_path, seq_size = 1):                        
+        self.add_image("./test_images/fugara_test_image_radial.png")
+        # for i in range(seq_size):
+        #     print "loading image ", i , " from sequnce: ", "seq_" + str(601+i).zfill(4) + ".png"
+        #     self.add_image(os.path.join(sequence_path, "seq_" + str(601+i).zfill(4) + ".png"))
     
     def next_image(self):
         self.cur_column = (self.cur_column + 1) % len(self.sequence)

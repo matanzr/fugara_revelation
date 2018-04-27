@@ -500,7 +500,9 @@ static PyObject *show(DotStarObject *self, PyObject *arg) {
 	if(PyTuple_Size(arg) == 1) { // Raw bytearray passed
 		Py_buffer buf;
 		if(!PyArg_ParseTuple(arg, "s*", &buf)) return NULL;
-		raw_write(self, buf.buf, buf.len);
+		for (int i =0; i < 1; i++) {
+			raw_write(self, buf.buf, buf.len);
+		}
 		PyBuffer_Release(&buf);
 	} else { // Write object's pixel buffer
 		if(self->brightness == 0) { // Send raw (no scaling)
