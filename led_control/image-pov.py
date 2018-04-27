@@ -8,13 +8,14 @@
 
 from PIL import Image
 from dotstar import Adafruit_DotStar
+import time
 
-filename  = "fugara_hello.png" # Image file to load
+filename  = "./test_sequence1/seq_0601.png" # Image file to load
 
 # Here's how to control the strip from any two GPIO pins:
 datapin   = 10
 clockpin  = 11
-strip     = Adafruit_DotStar(0, datapin, clockpin)
+strip     = Adafruit_DotStar(0, datapin, clockpin, 12500000)
 # Notice the number of LEDs is set to 0.  This is on purpose...we're asking
 # the DotStar module to NOT allocate any memory for this strip...we'll handle
 # our own allocation and conversion and will feed it 'raw' data.
@@ -69,6 +70,11 @@ for x in range(width):          # For each column of image...
 
 print( "Displaying...")
 while True:                            # Loop forever
-
-	for x in range(width):         # For each column of image...
+	
+	
+	for x in range(width):         # For each column of image...	
+		lt = time.time()	
 		strip.show(column[width-x-1])  # Write raw data to strip
+
+		print "after ", width, " shows, ", time.time() - lt, "passed (", 4000/(time.time() - lt), " hz)"
+
