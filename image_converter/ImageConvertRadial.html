@@ -1,78 +1,27 @@
 <html>
-    <canvas id="canvas"  width="288" height="288"></canvas>
-    <canvas id="canvas2" width="400" height="144"></canvas>
-    <script>
-        var save = true;
-        function downloadURI(uri, name) {
-            var link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            delete link;
+    <style>
+        .thumb {
+            height: 75px;
+            border: 1px solid #000;
+            margin: 10px 5px 0 0;
         }
+    </style>
 
-        var imageRGB = []
-        var img = new Image();
+    <div>
+        <input type="file" id="files" name="files[]" multiple />
+        <output id="list"></output>
+    </div>
 
-        var reproject = [];
+    <div style="display:inline-block; width: 40%">
+        <p>Input: (Recommended size 400x400)</p>
+        <canvas id="canvas"  width="288" height="288"></canvas>
+    </div>
+    <div style="display:inline-block; width: 40%">
+        <p>Output</p>
+        <div id="image-output"></div>
+        <button  style="display:block">Download</button>
+    </div>
 
-    
-        var file_name = "cube023.png";
-        img.src = './cube/' + file_name;
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        
-        var canvas2 = document.getElementById('canvas2');
-        var res_ctx = canvas2.getContext('2d');
+    <script src="image_converter.js" ></script>
 
-        var targetImageColumns = 400;
-        var myImageData;        
-
-
-
-        img.onload = function() {            
-            ctx.drawImage(img, 0, 0);
-            img.style.display = 'none';            
-            var img_data = ctx.getImageData(0,0,img.width,img.height).data;
-
-            var imageDiameter = img.width;
-            var target_imageDiameter = 144;
-            myImageData = res_ctx.createImageData(targetImageColumns, target_imageDiameter);
-            var new_data = myImageData.data;
-            var theta = 0;
-            var theta_increment = 2 * Math.PI / targetImageColumns;
-            for (var j=0; j < targetImageColumns; j++) {                
-                var dx = Math.cos(theta);
-                var dy = Math.sin(theta);        
-                var dd = imageDiameter / target_imageDiameter;    
-
-                for (var k=0; k < target_imageDiameter; k++) {                      
-                    var xk = dd*(-target_imageDiameter/2 + k) * dx + img.width / 2;
-                    var yk = dd*(-target_imageDiameter/2 + k) * dy + img.height / 2;      
-                    
-                    if (xk > img.width || yk > img.height || xk < 0 || yk < 0) {
-                        console.error("Assert: Trying to sample pixels out of image");
-                    }
-
-                    var cur_data = ctx.getImageData(xk,yk,1,1).data;
-                    new_data[4*(k*targetImageColumns + j)] = cur_data[0];
-                    new_data[4*(k*targetImageColumns + j) + 1] = cur_data[1]; // green
-                    new_data[4*(k*targetImageColumns + j) + 2] = cur_data[2]; // blue
-                    new_data[4*(k*targetImageColumns + j) + 3] = cur_data[3]; // alpha                                                    
-                }
-                theta += theta_increment; 
-            }                       
-            
-            res_ctx.putImageData(myImageData, 0, 0);
-
-            if (save) {                        
-                downloadURI(canvas2.toDataURL("image/png"), file_name);
-            }
-            
-        };
-
-        
-    </script>
 </html>
