@@ -20,15 +20,17 @@ var images_queue = [];
 function load_next() {
     var next_image = images_queue.pop();
     if (next_image) {
-        img.src = next_image;
+        img.src = next_image[1];
+        img.setAttribute("id", next_image[0]);
     }
 }
 
-img.onload = function() {
+img.onload = function() {    
     // canvas2 = document.getElementById('canvas2');
     var canvas2 = document.createElement("canvas");
     canvas2.setAttribute("width",400);
     canvas2.setAttribute("height",144);
+    canvas2.setAttribute("id", img.getAttribute("id"));
 
     output_div.appendChild(canvas2);
     var res_ctx = canvas2.getContext('2d');
@@ -65,11 +67,7 @@ img.onload = function() {
         theta += theta_increment;
     }
 
-    res_ctx.putImageData(myImageData, 0, 0);
-
-    // if (save) {
-    //     downloadURI(canvas2.toDataURL("image/png"), file_name);
-    // }
+    res_ctx.putImageData(myImageData, 0, 0);    
 
     load_next();
 };
@@ -90,7 +88,7 @@ function handleFileSelect(evt) {
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
             return function(e) {
-                images_queue.push(e.target.result);
+                images_queue.push( [theFile.name, e.target.result] );
                 // Render thumbnail.
                 var span = document.createElement('span');
                 span.innerHTML = ['<img class="thumb" src="', e.target.result,
@@ -108,6 +106,29 @@ function handleFileSelect(evt) {
         reader.readAsDataURL(f);
         sem++;
     }
+}
+
+function generate_zip(callback) {
+    var zip = new JSZip();
+    var images = output_div.children;
+
+    for (var i=0; i < images.length; i++ ) {
+       zip.file(images[i].getAttribute("id"), images[i].toDataURL("image/png").substr(22), {base64: true}); 
+    }  
+
+    zip.generateAsync({type:"blob"}).then(callback); 
+}
+
+function download_zip() {
+    generate_zip(function(content) {
+        var link = document.createElement("a");
+        link.download = "sequence.zip";
+        link.href = window.URL.createObjectURL(content);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        delete link;
+    });
 }
 
 
