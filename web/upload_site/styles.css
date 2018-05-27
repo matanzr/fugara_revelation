@@ -1,0 +1,22 @@
+#dropDiv {
+  width: 100%;
+  border: 1px solid #cccccc;
+  margin-top: 20px;
+  padding: 80px 20px;
+  text-align: center;
+  color: #cccccc;
+}
+#dropDiv.over {
+  border-color: #de7e7e;
+  color: #de7e7e;
+  background-color: #ffeded;
+}
+
+/* utility */
+.display-none {
+  display: none !important;
+}
+
+.text-align-center {
+  text-align: center !important;
+}
