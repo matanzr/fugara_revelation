@@ -29,6 +29,7 @@ function handleFileUploadSubmit(e) {
 }
 
 function uploadOneFile(folder, file) {
+  folder = folder.replace(/\./g, "-dot-");
   const path = `${folder}/${file.name}`;
   console.log(path);
   const uploadTask = storageRef.child(path).put(file); //create a child directory called images, and place the file inside this directory
@@ -52,18 +53,18 @@ function uploadOneFile(folder, file) {
     },
     () => {
       // Do something once upload is complete
-      writeUserData(file.name);
+      writeUserData(folder, file.name);
       $fileNameStatus.html(`בום! סיימנו!`);
       console.log("success");
     }
   );
 }
 
-function writeUserData(fileName) {
+function writeUserData(folder, fileName) {
   db.once("value").then(function(snapshot) {
     const fileStructure = snapshot.toJSON();
     const newFileStrocture = Object.assign({}, fileStructure, {
-      aaaa: "aaaa"
+      [folder]: folder
     });
     db.set(newFileStrocture);
   });
