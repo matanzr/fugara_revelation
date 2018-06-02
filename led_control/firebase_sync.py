@@ -40,7 +40,8 @@ file_structure = db.child("fugara-revelations").get()
 print json.dumps(file_structure.val())
 
 for firebase_folder in file_structure.val():
-  folder = "incoming_images/%s" %(firebase_folder)
+  folder = os.path.join("incoming_images", firebase_folder)
+  
   if not os.path.exists(folder):
     os.makedirs(folder)
   for i in range(6):
