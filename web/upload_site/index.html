@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./styles.css">
+</head>
+
+<body dir="rtl">
+  <div class="header">
+    <div>
+      שלומות!
+    </div>
+    הגעת לעמוד העלאת אנימציות עבור המיצב ״התגלות שמימית״ אשר יוצב בפסטיבל האור בירושלים 2018
+    <div>
+
+    </div>
+  </div>
+  <div class="description">
+    <div>
+      בכדי שהתהליך יהיה קל ומגניב לנו ולכם יש מספר כללים פשוטים שצריך לעקוב אחריהם:
+    </div>
+
+    <ol>
+      <li>יש להעלות קבצים בפורמט הבא: fan_1-file_1.png</li>
+      <li>אם אינכם מתכוונים להעלות אנימציות עבור 6 המאווררים תעלו רק עבור fan_1, אין צורך סתם להעתיק 6 פעמים </li>
+      <li>לא צריך לכווץ את התיקיה</li>
+      <li>אין לחרוג מגודל של 40MB סה״כ</li>
+      <li>אם יש בעיה לא לשכוח לנשום</li>
+    </ol>
+  </div>
+
+  <div>
+    הכנס מייל:
+    <input type="text" class="email-field">
+  </div>
+
+  <div id="filesubmit">
+    <input type="file" class="file-select" multiple />
+    <button class="file-submit">SUBMIT</button>
+  </div>
+
+  <div class="text-align-center">
+    <div class="file-name-status"></div>
+    <div class="progress-status"></div>
+  </div>
+
+  <!-- <div class="upload-section"> -->
+  <!-- <button class="file-button">העלה</button> -->
+  <!-- <input type="file" id="csvFileInput" class="display-none" onchange="handleFiles(this.files)"> -->
+  <!-- <div id="dropDiv">Drag & drop your files here!</div> -->
+  <!-- </div> -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+    crossorigin="anonymous"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.0.2/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyD7XsUY6ObxE4Z7iLg7rZW-0TZCqK5bvec",
+      authDomain: "fugara-revelations.firebaseapp.com",
+      databaseURL: "https://fugara-revelations.firebaseio.com",
+      projectId: "fugara-revelations",
+      storageBucket: "fugara-revelations.appspot.com",
+      messagingSenderId: "892679996381"
+    };
+    firebase.initializeApp(config);
+  </script>
+  <script src='./backend.js'></script>
+  <script src='./main.js'></script>
+  </script>
+</body>
+
+</html>
