@@ -60,6 +60,7 @@
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <bcm_host.h>
+#include <math.h>
 
 #define GPIO_BASE   0x200000
 #define BLOCK_SIZE  (4*1024)
@@ -110,6 +111,8 @@ static struct spi_ioc_transfer xfer[3] = {
 
 static int     MBOXfd    = -1;
 static uint8_t turboSave = 0;
+
+static uint8_t gamma_lu[256];
 
 static void turboOn(void), turboRestore(void);
 
@@ -190,6 +193,11 @@ static PyObject *DotStar_new(
 	PyObject      *string;
 	char          *order    = NULL, *c;
 	uint8_t        rOffset = 2, gOffset = 3, bOffset = 1; // BRG default
+
+	for (int i=0; i < 256; i++) {
+		gamma_lu[i] = (uint8_t)(pow((float)i / 255.0, 2.7) * 255.0 + 0.5);
+	}
+	
 
 	switch(PyTuple_Size(arg)) {
 	   case 4: // Pixel count, data pin, clock pin, bitrate
@@ -492,6 +500,37 @@ static void raw_write(DotStarObject *self, uint8_t *ptr, uint32_t len) {
 	}
 }
 
+static PyObject *prepareBuffer(DotStarObject *self, PyObject *arg) {
+	if(PyTuple_Size(arg) == 3) { // Raw bytearray passed
+		Py_buffer buf;
+		Py_buffer img;
+		int offset;
+		if(!PyArg_ParseTuple(arg, "s*|s*|i", &buf, &img, &offset)) return NULL;
+		
+		// gamma_lu
+		int len = img.len;
+		uint8_t *ptr_img = img.buf;
+		uint8_t *ptr_buf = buf.buf;
+
+		uint8_t r_offset = 3;
+		uint8_t g_offset = 2;
+		uint8_t b_offset = 1;
+
+	    len = buf.len;
+		for (int i=0, j=0; i < buf.len; i+=4, j+=3) {
+			*(ptr_buf + i) = 0xFF;
+			*(ptr_buf + i + r_offset) = gamma_lu[*(ptr_img + offset + j + 1)];
+			*(ptr_buf + i + g_offset) = gamma_lu[*(ptr_img + offset + j + 2)];
+			*(ptr_buf + i + b_offset) = gamma_lu[*(ptr_img + offset + j + 3)];
+		}
+		
+		PyBuffer_Release(&buf);
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 // Issue data to strip.  Optional arg = raw bytearray to issue to strip
 // (else object's pixel buffer is used).  If passing raw data, it must
 // be in strip-ready format (4 bytes/pixel, 0xFF/B/G/R) and no brightness
@@ -673,6 +712,7 @@ static PyMethodDef methods[] = {
   { "getBrightness", (PyCFunction)getBrightness, METH_NOARGS , NULL },
   { "getPixels"    , (PyCFunction)getPixels    , METH_NOARGS , NULL },
   { "close"        , (PyCFunction)_close       , METH_NOARGS , NULL },
+  { "prepareBuffer", (PyCFunction)prepareBuffer, METH_VARARGS , NULL },
   { NULL, NULL, 0, NULL }
 };
 
