@@ -4,15 +4,10 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 import json
+import shutil
+import zipfile
 
-# cred = credentials.Certificate("./serviceAccountKey.json")
-# firebase = firebase_admin.initialize_app(cred)
-
-
-# cwd = os.getcwd()
-
-# print(os.getcwd() + "\n")
-print('start')
+TARGET_FOLDER = "incoming_images"
 
 config = {
   "apiKey": "AIzaSyD7XsUY6ObxE4Z7iLg7rZW-0TZCqK5bvec",
@@ -39,20 +34,35 @@ db = firebase.database()
 file_structure = db.child("fugara-revelations").get()
 print json.dumps(file_structure.val())
 
+# clean
+if os.path.exists(TARGET_FOLDER):
+  shutil.rmtree(TARGET_FOLDER)
+os.mkdir(TARGET_FOLDER)
+
+file = open( os.path.join(TARGET_FOLDER, "README.md"), "w")
+file.write("This folder is for incoming images downloaded by 'firebase_sync.py'")
+file.close()
+
 for firebase_folder in file_structure.val():
-  folder = os.path.join("incoming_images", firebase_folder)
+  folder = os.path.join(TARGET_FOLDER, firebase_folder)
   
   if not os.path.exists(folder):
     os.makedirs(folder)
   for i in range(6):
-    firebase_path = "%s/fan_%s-file_%s.zip" % (firebase_folder, i, i)
-    local_path = "%s/fan_%s-file_%s.zip" % (folder, i, i)
-    print "firebase_path:  %s, local_path: %s" % (firebase_path, local_path)
+    fan_file = "fan_%s-file_%s.zip" % (i,i) # TODO: what's the meaning of file number in zip?
+
+    firebase_path = os.path.join(firebase_folder, fan_file)
+    local_path = os.path.join(folder, fan_file)
+
     try:
       storage.child(firebase_path).download(local_path)
+      print "Got firebase_path: %s, written local_path: %s" % (firebase_path, local_path)
+      zip_ref = zipfile.ZipFile(local_path, 'r')
+      zip_ref.extractall(folder)
+      zip_ref.close()
+
     except Exception as e:
-      print "failed. exception: %s" % (sys.exc_info()[0])
-      print "Make you sure you've created the 'incoming_images' folder under the current working directory"
+      print fan_file, "download failed. exception: %s" % (sys.exc_info()[0])
 
 # as admin
 # storage.child("images/example.jpg").put("example2.jpg")

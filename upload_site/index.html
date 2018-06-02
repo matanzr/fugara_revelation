@@ -33,25 +33,23 @@
   <div>
     הכנס מייל:
     <input type="text" class="email-field">
+    מאורר מספר
+    <input type="number" min="1" max="6" value="1" class="fan-id">
   </div>
-
-  <!-- <div id="filesubmit">
-    <input type="file" class="file-select" multiple />
-    <button class="file-submit">SUBMIT</button>
-  </div> -->
 
   <div>
     <input type="file" id="files" name="files[]" multiple />
     <output id="list"></output>
   </div>
 
+  <button style="display:block" onclick="download_zip()">Download</button>
+    <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
+
   <div style="display:block; width: 40%">
     <p>Input: (Recommended size 400x400)</p>
     <canvas id="canvas" width="288" height="288"></canvas>
   </div>
   <div style="display:inline-block; width: 40%">
-    <button style="display:block" onclick="download_zip()">Download</button>
-    <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
     <p>Output</p>
     <div id="image-output"></div>
   </div>
