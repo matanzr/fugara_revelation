@@ -20,3 +20,9 @@
 .text-align-center {
   text-align: center !important;
 }
+
+.thumb {
+  height: 75px;
+  border: 1px solid #000;
+  margin: 10px 5px 0 0;
+}

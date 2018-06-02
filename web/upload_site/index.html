@@ -35,9 +35,25 @@
     <input type="text" class="email-field">
   </div>
 
-  <div id="filesubmit">
+  <!-- <div id="filesubmit">
     <input type="file" class="file-select" multiple />
     <button class="file-submit">SUBMIT</button>
+  </div> -->
+
+  <div>
+    <input type="file" id="files" name="files[]" multiple />
+    <output id="list"></output>
+  </div>
+
+  <div style="display:block; width: 40%">
+    <p>Input: (Recommended size 400x400)</p>
+    <canvas id="canvas" width="288" height="288"></canvas>
+  </div>
+  <div style="display:inline-block; width: 40%">
+    <button style="display:block" onclick="download_zip()">Download</button>
+    <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
+    <p>Output</p>
+    <div id="image-output"></div>
   </div>
 
   <div class="text-align-center">
@@ -66,7 +82,9 @@
     };
     firebase.initializeApp(config);
   </script>
+  <script src="./jszip.min.js"></script>
   <script src='./backend.js'></script>
+  <script src='./imageConverter.js'></script>
   <script src='./main.js'></script>
   </script>
 </body>

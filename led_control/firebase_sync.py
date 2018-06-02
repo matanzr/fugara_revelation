@@ -12,6 +12,7 @@ import json
 # cwd = os.getcwd()
 
 # print(os.getcwd() + "\n")
+print('start')
 
 config = {
   "apiKey": "AIzaSyD7XsUY6ObxE4Z7iLg7rZW-0TZCqK5bvec",
@@ -27,8 +28,11 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 firebase = pyrebase.initialize_app(config)
 
+print('init done..')
+
 # Log the user in
 user = auth.sign_in_with_email_and_password('arnonhecht@gmail.com', 'noninoni')
+print('auth done..')
 
 storage = firebase.storage()
 db = firebase.database()
@@ -40,9 +44,9 @@ for firebase_folder in file_structure.val():
   if not os.path.exists(folder):
     os.makedirs(folder)
   for i in range(6):
-    firebase_path = "%s/fan_%s-file_%s.png" % (firebase_folder, i, i)
-    local_path = "%s/fan_%s-file_%s.png" % (folder, i, i)
-    print "firebase_path:  %s, local_path" % (firebase_path, local_path)
+    firebase_path = "%s/fan_%s-file_%s.zip" % (firebase_folder, i, i)
+    local_path = "%s/fan_%s-file_%s.zip" % (folder, i, i)
+    print "firebase_path:  %s, local_path: %s" % (firebase_path, local_path)
     try:
       storage.child(firebase_path).download(local_path)
     except Exception as e:
@@ -52,6 +56,6 @@ for firebase_folder in file_structure.val():
 # as admin
 # storage.child("images/example.jpg").put("example2.jpg")
 
-print('lalala')
-storage.child('222/styles.css').download('here.png')
+print('lalala.. Done!')
+# storage.child('222/styles.css').download('here.png')
 # download

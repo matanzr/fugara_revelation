@@ -5,27 +5,42 @@ const storageRef = storageService.ref();
 const $fileNameStatus = $(".file-name-status");
 const $progressStatus = $(".progress-status");
 
-document
-  .querySelector(".file-select")
-  .addEventListener("change", handleFileUploadChange);
-document
-  .querySelector(".file-submit")
-  .addEventListener("click", handleFileUploadSubmit);
+// document
+//   .querySelector(".file-select")
+//   .addEventListener("change", handleFileUploadChange);
+// document
+//   .querySelector(".file-submit")
+//   .addEventListener("click", handleFileUploadSubmit);
 
 let selectedFiles;
 function handleFileUploadChange(e) {
   selectedFiles = e.target.files;
 }
 
-function handleFileUploadSubmit(e) {
+// function handleFileUploadSubmit(e) {
+//   const $email = $(".email-field");
+//   if (!$email.val()) {
+//     alert("הכנס כתובת אי מייל");
+//     return;
+//   }
+//   for (var i = 0; i < selectedFiles.length; i++) {
+//     uploadOneFile($email.val(), selectedFiles[i]);
+//   }
+// }
+
+function handleZipFileUpload(e) {
   const $email = $(".email-field");
   if (!$email.val()) {
     alert("הכנס כתובת אי מייל");
     return;
   }
-  for (var i = 0; i < selectedFiles.length; i++) {
-    uploadOneFile($email.val(), selectedFiles[i]);
-  }
+  generate_zip(function(content) {
+    const zipFileToLoad = new File([content], "fan_0-file_0.zip", {
+      type: content.contentType,
+      lastModified: Date.now()
+    });
+    uploadOneFile($email.val(), zipFileToLoad);
+  });
 }
 
 function uploadOneFile(folder, file) {
