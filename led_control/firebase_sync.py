@@ -49,16 +49,19 @@ for firebase_folder in file_structure.val():
   if not os.path.exists(folder):
     os.makedirs(folder)
   for i in range(6):
-    fan_file = "fan_%s-file_%s.zip" % (i,i) # TODO: what's the meaning of file number in zip?
+    fan_folder = "%s/fan_%s" % (folder, i+1)
+    if not os.path.exists(fan_folder):
+      os.makedirs(fan_folder)
+    fan_file = "fan_%s.zip" % (i+1) # TODO: what's the meaning of file number in zip?
 
     firebase_path = os.path.join(firebase_folder, fan_file)
-    local_path = os.path.join(folder, fan_file)
+    local_path = os.path.join(fan_folder, fan_file)
 
     try:
       storage.child(firebase_path).download(local_path)
       print "Got firebase_path: %s, written local_path: %s" % (firebase_path, local_path)
       zip_ref = zipfile.ZipFile(local_path, 'r')
-      zip_ref.extractall(folder)
+      zip_ref.extractall(fan_folder)
       zip_ref.close()
 
     except Exception as e:

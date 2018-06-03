@@ -32,8 +32,7 @@
 
   <div>
     הכנס מייל:
-    <input type="text" class="email-field">
-    מאורר מספר
+    <input type="text" class="email-field"> מאורר מספר
     <input type="number" min="1" max="6" value="1" class="fan-id">
   </div>
 
@@ -43,15 +42,10 @@
   </div>
 
   <button style="display:block" onclick="download_zip()">Download</button>
-    <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
+  <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
 
-  <div style="display:block; width: 40%">
-    <p>Input: (Recommended size 400x400)</p>
-    <canvas id="canvas" width="288" height="288"></canvas>
-  </div>
-  <div style="display:inline-block; width: 40%">
-    <p>Output</p>
-    <div id="image-output"></div>
+  <div class="converter-dom-elements-container">
+    <!--  -->
   </div>
 
   <div class="text-align-center">
