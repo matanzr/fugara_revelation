@@ -501,11 +501,12 @@ static void raw_write(DotStarObject *self, uint8_t *ptr, uint32_t len) {
 }
 
 static PyObject *prepareBuffer(DotStarObject *self, PyObject *arg) {
-	if(PyTuple_Size(arg) == 3) { // Raw bytearray passed
+	if(PyTuple_Size(arg) == 4) { // Raw bytearray passed
 		Py_buffer buf;
 		Py_buffer img;
 		int offset;
-		if(!PyArg_ParseTuple(arg, "s*|s*|i", &buf, &img, &offset)) return NULL;
+		int multiplier;
+		if(!PyArg_ParseTuple(arg, "s*|s*|i|i", &buf, &img, &offset, &multiplier)) return NULL;
 		
 		// gamma_lu
 		int len = img.len;
@@ -517,11 +518,11 @@ static PyObject *prepareBuffer(DotStarObject *self, PyObject *arg) {
 		uint8_t b_offset = 1;
 
 	    len = buf.len;
-		for (int i=0, j=0; i < buf.len; i+=4, j+=3) {
+		for (int i=0, j=0; i < buf.len; i+=4, j++) {
 			*(ptr_buf + i) = 0xFF;
-			*(ptr_buf + i + r_offset) = gamma_lu[*(ptr_img + offset + j + 1)];
-			*(ptr_buf + i + g_offset) = gamma_lu[*(ptr_img + offset + j + 2)];
-			*(ptr_buf + i + b_offset) = gamma_lu[*(ptr_img + offset + j + 3)];
+			*(ptr_buf + i + r_offset) = gamma_lu[*(ptr_img + offset + j*multiplier + 0)];
+			*(ptr_buf + i + g_offset) = gamma_lu[*(ptr_img + offset + j*multiplier + 1)];
+			*(ptr_buf + i + b_offset) = gamma_lu[*(ptr_img + offset + j*multiplier + 2)];
 		}
 		
 		PyBuffer_Release(&buf);

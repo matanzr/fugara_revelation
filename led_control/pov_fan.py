@@ -46,8 +46,15 @@ class PovFan:
         for x in range(width):
             column[x] = bytearray(STRIP_LENGTH * 4)        
         
+        bytess = img.tobytes()
         
-        # # Calculate gamma correction table, makes mid-range colors look 'right':
+        for x in range(width): 
+            offset = x * 3
+            multiplier = width * 3
+            self.strip.prepareBuffer(column[x], bytess, offset, multiplier);
+        
+        
+        # Calculate gamma correction table, makes mid-range colors look 'right':
         # gamma = bytearray(256)
         # for i in range(256):
         #     gamma[i] = int(pow(float(i) / 255.0, 2.7) * 255.0 + 0.5)
@@ -56,17 +63,16 @@ class PovFan:
         # for x in range(width):          # For each column of image...
         #     for y in range(STRIP_LENGTH): # For each pixel in column...
         #         value             = pixels[x, y]    # Read pixel in image
-        #         y4                = y * 4           # Position in raw buffer
-        #         column[x][y4]     = 0xFF            # Pixel start marker
-        #         column[x][y4 + rOffset] = int(LED_BRIGHTNESS * gamma[value[0]]) # Gamma-corrected R
-        #         column[x][y4 + gOffset] = int(LED_BRIGHTNESS * gamma[value[1]]) # Gamma-corrected G
-        #         column[x][y4 + bOffset] = int(LED_BRIGHTNESS * gamma[value[2]]) # Gamma-corrected B
+        #         y4                = y * 4           # Position in raw buffer                
+        #         if column[x][y4] != 0xFF: assert("not even")
+        #         if column[x][y4 + rOffset] != int(gamma[value[0]]): print column[x][y4 + rOffset], int(gamma[value[0]])
+        #         if column[x][y4 + gOffset] != int(gamma[value[1]]): print meh
+        #         if column[x][y4 + bOffset] != int(gamma[value[2]]): print meh
+        #         # column[x][y4]     = 0xFF            # Pixel start marker
+        #         # column[x][y4 + rOffset] = int(LED_BRIGHTNESS * gamma[value[0]]) # Gamma-corrected R
+        #         # column[x][y4 + gOffset] = int(LED_BRIGHTNESS * gamma[value[1]]) # Gamma-corrected G
+        #         # column[x][y4 + bOffset] = int(LED_BRIGHTNESS * gamma[value[2]]) # Gamma-corrected B
         
-        bytess = img.tobytes()
-        
-        for x in range(width): 
-            offset = x * 3 * STRIP_LENGTH
-            self.strip.prepareBuffer(column[x], bytess, offset);
              
         self.sequence.append(column)
         self.width = width
