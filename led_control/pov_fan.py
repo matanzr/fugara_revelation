@@ -1,4 +1,5 @@
 import os
+import glob
 is_running_on_pi = os.uname()[4][:3] == 'arm'
 from PIL import Image
 
@@ -52,27 +53,6 @@ class PovFan:
             offset = x * 3
             multiplier = width * 3
             self.strip.prepareBuffer(column[x], bytess, offset, multiplier);
-        
-        
-        # Calculate gamma correction table, makes mid-range colors look 'right':
-        # gamma = bytearray(256)
-        # for i in range(256):
-        #     gamma[i] = int(pow(float(i) / 255.0, 2.7) * 255.0 + 0.5)
-
-        # print( "Converting...")
-        # for x in range(width):          # For each column of image...
-        #     for y in range(STRIP_LENGTH): # For each pixel in column...
-        #         value             = pixels[x, y]    # Read pixel in image
-        #         y4                = y * 4           # Position in raw buffer                
-        #         if column[x][y4] != 0xFF: assert("not even")
-        #         if column[x][y4 + rOffset] != int(gamma[value[0]]): print column[x][y4 + rOffset], int(gamma[value[0]])
-        #         if column[x][y4 + gOffset] != int(gamma[value[1]]): print meh
-        #         if column[x][y4 + bOffset] != int(gamma[value[2]]): print meh
-        #         # column[x][y4]     = 0xFF            # Pixel start marker
-        #         # column[x][y4 + rOffset] = int(LED_BRIGHTNESS * gamma[value[0]]) # Gamma-corrected R
-        #         # column[x][y4 + gOffset] = int(LED_BRIGHTNESS * gamma[value[1]]) # Gamma-corrected G
-        #         # column[x][y4 + bOffset] = int(LED_BRIGHTNESS * gamma[value[2]]) # Gamma-corrected B
-        
              
         self.sequence.append(column)
         self.width = width
@@ -80,16 +60,13 @@ class PovFan:
         img.close()
 
     #TODO: set sequence length
-    def load_sequence(self, sequence_path, seq_size = 1):                        
-        # self.add_image("./test_images/test_skull.png")
-        # self.add_image("./viceland/viceland050.png")
+    def load_sequence(self, sequence_path, fan_id, seq_size = -1):                                
         start = time.time()
-        for i in range(seq_size):
-            #viceland/viceland000.png
-            print "loading image ", i , " from sequnce: ", "cube" + str(0+i).zfill(3) + ".png"
-            # self.add_image(os.path.join(sequence_path, "cube" + str(0+i).zfill(3) + ".png"))
-            # print "loading image ", i , " from sequnce: ", "viceland" + str(150+i).zfill(3) + ".png"
-            self.add_image(os.path.join(sequence_path, "viceland" + str(0+i).zfill(3) + ".png"))
+        path = os.path.join('incoming_images', sequence_path, "fan_"+str(fan_id))
+        files = sorted( glob.glob( os.path.join(path, "*.png") ))
+        for i in files:
+            print "loading image ", i            
+            self.add_image(i)
         
         print "loading took ", time.time() - start
     
@@ -162,5 +139,5 @@ class PovFan:
 
 if __name__ == "__main__":
     fan = PovFan()
-    fan.load_sequence("./viceland/", 200)
+    fan.load_sequence("eagle", 1)
     fan.play(200)

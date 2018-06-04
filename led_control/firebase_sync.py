@@ -6,6 +6,7 @@ from firebase_admin import credentials
 import json
 import shutil
 import zipfile
+import glob
 
 TARGET_FOLDER = "incoming_images"
 
@@ -63,6 +64,8 @@ for firebase_folder in file_structure.val():
       zip_ref = zipfile.ZipFile(local_path, 'r')
       zip_ref.extractall(fan_folder)
       zip_ref.close()
+
+      print sorted(glob.glob(os.path.join(fan_folder,'*.png')))
 
     except Exception as e:
       print fan_file, "download failed. exception: %s" % (sys.exc_info()[0])
