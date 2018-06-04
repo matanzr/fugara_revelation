@@ -5,37 +5,21 @@ const storageRef = storageService.ref();
 const $fileNameStatus = $(".file-name-status");
 const $progressStatus = $(".progress-status");
 
-// document
-//   .querySelector(".file-select")
-//   .addEventListener("change", handleFileUploadChange);
-// document
-//   .querySelector(".file-submit")
-//   .addEventListener("click", handleFileUploadSubmit);
-
 let selectedFiles;
 function handleFileUploadChange(e) {
   selectedFiles = e.target.files;
 }
 
-// function handleFileUploadSubmit(e) {
-//   const $email = $(".email-field");
-//   if (!$email.val()) {
-//     alert("הכנס כתובת אי מייל");
-//     return;
-//   }
-//   for (var i = 0; i < selectedFiles.length; i++) {
-//     uploadOneFile($email.val(), selectedFiles[i]);
-//   }
-// }
-
 function handleZipFileUpload(e) {
   const $email = $(".email-field");
+  const fanId = $(".fan-id").val();
+
   if (!$email.val()) {
     alert("הכנס כתובת אי מייל");
     return;
   }
   generate_zip(function(content) {
-    const zipFileToLoad = new File([content], "fan_0-file_0.zip", {
+    const zipFileToLoad = new File([content], `fan_${fanId}.zip`, {
       type: content.contentType,
       lastModified: Date.now()
     });
@@ -65,12 +49,14 @@ function uploadOneFile(folder, file) {
       $fileNameStatus.html(
         `פישלנו.. משהו לא עובד.... הפאק הזה עלינו אז תודיעו לנו בבקשה :)`
       );
+      initConverter();
     },
     () => {
       // Do something once upload is complete
       writeUserData(folder, file.name);
       $fileNameStatus.html(`בום! סיימנו!`);
       console.log("success");
+      initConverter();
     }
   );
 }
