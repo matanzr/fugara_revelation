@@ -4,8 +4,8 @@ import time
 from pov_fan import PovFan
 import random
 
-# server_url = "http://192.168.1.109:3000/"
-server_url = "http://0.0.0.0:3000/"
+server_url = "http://192.168.1.15:3000/"
+# server_url = "http://0.0.0.0:3000/"
 
 
 REGISTER = "register"
