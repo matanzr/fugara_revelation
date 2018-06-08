@@ -8,7 +8,7 @@ var keystone = require('keystone');
 keystone.init({
 	'name': 'Fans Server',
 	'brand': 'Fans Server',
-
+	'logger': false,
 	'less': 'public',
 	'static': 'public',
 	'favicon': 'public/favicon.ico',

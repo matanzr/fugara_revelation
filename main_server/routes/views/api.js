@@ -37,7 +37,7 @@ exports = module.exports = {
 	},
 
 	GetAction: function (req, res) {
-		// console.log('Get Action: ' + JSON.stringify(req.body));
+		console.log('Get Action: ' + JSON.stringify(req.body));
 		let fanId = req.body.fanId;
 		let state = req.body.state;
 		let asset = req.body.asset;
