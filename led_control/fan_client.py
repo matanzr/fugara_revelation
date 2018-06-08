@@ -88,6 +88,10 @@ class FanClient:
             if send_action_res == "Need Restart":
                 self.run();
                 return;
+            if (send_action_res and ('error' in send_action_res)):
+                print "Recived error: ", send_action_res["error"]
+                self.run();
+                return;
 
             next_state = send_action_res;
             if next_state["action"] != self.action:
@@ -102,7 +106,7 @@ class FanClient:
             time.sleep(self.interval)
 
 if __name__ == "__main__":
-    client = FanClient("1")
+    client = FanClient(str(1))
     client.run()
 
     # client.load_sequence("test_images/fugara_test_image_radial.png")

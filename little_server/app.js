@@ -10,9 +10,9 @@ app.use(bodyParser.json());
 
 
 var playlist = [
-  { asset: "eagle", duration: 5 },
-  { asset: "cube", duration: 5 },
-  { asset: "tunnel", duration: 5 },
+  { asset: "eagle", duration: 20 },
+  { asset: "cube", duration: 20 },
+  { asset: "tunnel", duration: 20 },
 ];
 var current_asset_index = 0;
 var current_server_state = "fans_stopped"; //'fans_stopped'\'fans_loading'\'fans_drawing'
@@ -52,7 +52,6 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/action', (req, res) => {
-
     let fanID = req.body.fanId; if (!fanID) { return res.json({ error: 'Didn\'t get a fanId' }); }
     let state = req.body.state; if (!fanID) { return res.json({ error: 'Didn\'t get a state' }); }
     let asset = req.body.asset; if (!fanID) { return res.json({ error: 'Didn\'t get a asset' }); }
@@ -116,7 +115,7 @@ setInterval(function() {
     if (online_fans[fanID].state != "connected") {
         all_in_connected_state = false;
     }
-    if (new Date() - online_fans[fanID].last_ping_date > 2500) {
+    if (new Date() - online_fans[fanID].last_ping_date > 15000) {
       delete online_fans[fanID];
       console.log("Removed fan with id: " + fanID);
     }
