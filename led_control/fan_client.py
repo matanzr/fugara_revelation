@@ -102,7 +102,7 @@ class FanClient:
             time.sleep(self.interval)
 
 if __name__ == "__main__":
-    client = FanClient(str(random.randint(1,9)*5))
+    client = FanClient(1)
     client.run()
 
     # client.load_sequence("test_images/fugara_test_image_radial.png")
