@@ -3,9 +3,14 @@ import json
 import time
 from pov_fan import PovFan
 import random
+import os
+
 
 server_url = "http://192.168.1.15:3000/"
-# server_url = "http://0.0.0.0:3000/"
+try:
+    server_url = os.environ['SERVER_IP']
+except:
+    print "No environment variables for server ip"
 
 
 REGISTER = "register"
@@ -106,7 +111,12 @@ class FanClient:
             time.sleep(self.interval)
 
 if __name__ == "__main__":
-    client = FanClient(str(1))
+    client = FanClient(str(random.randint(1,9)*5))
+    try:
+        client = FanClient(os.environ['FAN_ID'])
+    except:
+        print "No environment variables for fan id"
+
     client.run()
 
     # client.load_sequence("test_images/fugara_test_image_radial.png")
