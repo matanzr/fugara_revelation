@@ -10,7 +10,7 @@ https://www.raspberrypi.org/downloads/raspbian/
 - Set up wifi:
 Edit `wpa_supplicat.conf` (version attached in this repo) to match your wifi, then copy it to the boot sdcrad you made in last step.
 
-- Enable spi: 
+- Enable spi:
 Edit config.txt on sdcard - uncomment `dtparam=spi=on`
 
 - Connecting to PI over ssh
@@ -23,14 +23,14 @@ Edit config.txt on sdcard - uncomment `dtparam=spi=on`
     - `sudo reboot`
     - now ssh with new name: `ssh pi@rev{number}.local`
 
-- Install packages 
+- Install packages
     - `sudo apt-get update`
     - `sudo apt-get install build-essential python-pip python-dev python-smbus git python-gpiozero libopenjp2-7-dev libtiff5-dev`
 
     - (optional) Prepare GIT: `git config --global user.name "John Doe" && git config --global user.email johndoe@example.com`
-    
+
     - `mkdir dev && cd dev`
-    - Fetch the Adafruit_Python_GPIO library: 
+    - Fetch the Adafruit_Python_GPIO library:
         ```
         git clone https://github.com/adafruit/Adafruit_Python_GPIO.git
         cd Adafruit_Python_GPIO
@@ -46,6 +46,12 @@ Edit config.txt on sdcard - uncomment `dtparam=spi=on`
 - Setup script service
     - `pip install pyrebase`
     - `pip install firebase_admin`
+
+- add environment var to pi
+    -  'sudo nano /etc/environment'
+    - SERVER_IP=http://192.168.1.15:3000/
+      FAN_ID=4
+
 
 ## Perparing Content
 

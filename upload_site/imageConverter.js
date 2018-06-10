@@ -154,8 +154,8 @@ function appendConverterDomElements() {
   $converterContainer.empty();
   const domElement = $.parseHTML(`
       <div style="display:block; width: 40%">
-        <!--<p>Input: (Recommended size 400x400)</p>-->
-        <canvas id="canvas" width="288" height="288"></canvas>
+        <p>Input: (Recommended size 400x400)</p>
+        <canvas id="canvas" width="400" height="400"></canvas>
       </div>
       <div style="display:inline-block; width: 40%">
         <p>Output</p>
