@@ -1,5 +1,6 @@
 window.onload = function() {
   initConverter();
+  toggleInputsDisabled(false);
 };
 
 function traverseFileTree(item, path) {
@@ -18,4 +19,12 @@ function traverseFileTree(item, path) {
       }
     });
   }
+}
+
+function toggleInputsDisabled(bool) {
+  const $inputs = $("input, button");
+  const $loader = $(".loader");
+  console.log(`$inputs: ${JSON.stringify($inputs)}`);
+  $inputs.attr("disabled", bool);
+  $loader[bool ? "show" : "hide"]();
 }
