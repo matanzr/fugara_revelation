@@ -5,6 +5,7 @@ var bodyParser = require('body-parser')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/', express.static('public'))
 
 
 
@@ -19,18 +20,18 @@ var current_server_state = "fans_stopped"; //'fans_stopped'\'fans_loading'\'fans
 var current_animation_starting_time;
 
 var online_fans = {
-  dummy_fan: {
-    state: "stoped", //"stoped"/"loading"/"playing"
-    ip: "0.0.0.0",
-    last_ping_date: new Date(),
-    asset: ""
-  }
+  // dummy_fan: {
+  //   state: "stoped", //"stoped"/"loading"/"playing"
+  //   ip: "0.0.0.0",
+  //   last_ping_date: new Date(),
+  //   asset: ""
+  // }
 }
 
 
 
 
-app.get('/', (req, res) => res.send('Server up!'))
+// app.get('/', (req, res) => res.send('Server up!'))
 app.post('/register', (req, res) => {
 		let fanID = req.body.fanId; if (!fanID) { return res.json({ error: 'Didn\'t get a fanId' }); }
 
@@ -93,6 +94,16 @@ app.post('/action', (req, res) => {
 			}
 });
 
+app.get('/status', (req, res) => {
+    res.json({
+      current_asset_index: current_asset_index,
+      current_server_state: current_server_state,
+      current_animation_starting_time: current_animation_starting_time,
+      playlist: playlist,
+      online_fans: online_fans
+    });
+});
+
 app.listen(3000, () => console.log('Listening on port 3000'))
 
 
@@ -115,9 +126,12 @@ setInterval(function() {
     if (online_fans[fanID].state != "connected") {
         all_in_connected_state = false;
     }
-    if (new Date() - online_fans[fanID].last_ping_date > 15000) {
+    var should_remove = false;
+    if (new Date() - online_fans[fanID].last_ping_date > 30000) { should_remove = true; }
+    if (should_remove) {
       delete online_fans[fanID];
       console.log("Removed fan with id: " + fanID);
+      console.log("current_server_state: " + current_server_state);
     }
   }
   if (online_fans.length == 0 || all_in_connected_state) {
