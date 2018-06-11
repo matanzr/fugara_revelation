@@ -22,6 +22,8 @@ function load_next() {
   if (next_image) {
     img.src = next_image[1];
     img.setAttribute("id", next_image[0]);
+  } else {
+    toggleInputsDisabled(false);
   }
 }
 
@@ -77,6 +79,8 @@ img.onload = function() {
 
 var sem = 0;
 function handleFileSelect(evt) {
+  toggleInputsDisabled(true);
+
   var files = evt.target.files; // FileList object
   const $thumbList = $("#list");
   $thumbList.empty();
@@ -151,7 +155,7 @@ function appendConverterDomElements() {
   const domElement = $.parseHTML(`
       <div style="display:block; width: 40%">
         <p>Input: (Recommended size 400x400)</p>
-        <canvas id="canvas" width="288" height="288"></canvas>
+        <canvas id="canvas" width="400" height="400"></canvas>
       </div>
       <div style="display:inline-block; width: 40%">
         <p>Output</p>

@@ -7,57 +7,91 @@
 </head>
 
 <body dir="rtl">
-  <div class="header">
-    <div>
-      שלומות!
+  <div class="background-image-container"></div>
+  <div class="content">
+    <div class="header">
+      <div class="title">
+        שלומות!
+      </div>
+      <div class="sub-title">
+        הגעת לעמוד העלאת אנימציות עבור המיצב ״התגלות שמימית״ אשר יוצב בפסטיבל האור בירושלים 2018
+      </div>
     </div>
-    הגעת לעמוד העלאת אנימציות עבור המיצב ״התגלות שמימית״ אשר יוצב בפסטיבל האור בירושלים 2018
-    <div>
+    <div class="section">
+      <div>
+        בכדי שהתהליך יהיה קל ומגניב לנו ולכם יש מספר כללים פשוטים שצריך לעקוב אחריהם:
+      </div>
 
+      <ol>
+        <li>העלו קבצי png בלבד</li>
+        <li>סדרו את הקבצים כך שהקובץ הראשון הוא הפריים הראשון וכן הלאה. אין חשיבות לשמות שלהם רק שיהיו מסודרים.</li>
+        <li>לדוגמא: a.png, b.png, ....</li>
+        <li>הרזולוציה המומלצת לתמונות היא 400X400 ובכל מקרה גובה ורוחב שווים</li>
+        <li>אין לחרוג מגודל של 40MB סה״כ</li>
+        <li>אם יש בעיה לא לשכוח לנשום</li>
+        <!--
+        <li>יש להעלות קבצים בפורמט הבא: fan_1-file_1.png</li>
+        <li>אם אינכם מתכוונים להעלות אנימציות עבור 6 המאווררים תעלו רק עבור fan_1, אין צורך סתם להעתיק 6 פעמים </li>
+        <li>לא צריך לכווץ את התיקיה</li>
+        <li>אין לחרוג מגודל של 40MB סה״כ</li>
+        <li>אם יש בעיה לא לשכוח לנשום</li>
+        -->
+      </ol>
     </div>
-  </div>
-  <div class="description">
-    <div>
-      בכדי שהתהליך יהיה קל ומגניב לנו ולכם יש מספר כללים פשוטים שצריך לעקוב אחריהם:
+
+    <div class="section">
+      <div>
+        אופן השימוש בעמוד:
+      </div>
+
+      <ol>
+        <li>רשמו את שם האנימציה שלכם (תזכרו אותו, לשם אתם מעלים את הקבצים)</li>
+        <li>בחרו את מספר המאוורר שאליו אתם מעלים כעת (אם יש לכם אנימציה אחת עבור כל המאווררים תעלו רק למאוורר 1)</li>
+        <li>בחרו את הקבצים</li>
+        <li>בחרו את הקבצים, חכו, זה יקח קצת זמן :)</li>
+
+        <li>לחצו על upload to server, חכו, זה יקח קצת זמן :)</li>
+      </ol>
     </div>
 
-    <ol>
-      <li>יש להעלות קבצים בפורמט הבא: fan_1-file_1.png</li>
-      <li>אם אינכם מתכוונים להעלות אנימציות עבור 6 המאווררים תעלו רק עבור fan_1, אין צורך סתם להעתיק 6 פעמים </li>
-      <li>לא צריך לכווץ את התיקיה</li>
-      <li>אין לחרוג מגודל של 40MB סה״כ</li>
-      <li>אם יש בעיה לא לשכוח לנשום</li>
-    </ol>
+    <div class="section upload-inputs">
+      <div class="section">
+        הכנס את שם האנימציה: &nbsp
+        <input type="text" class="email-field">
+      </div>
+      <div class="section">
+        מאורר מספר:&nbsp
+        <input type="number" min="1" max="6" value="1" class="fan-id">
+      </div>
+
+      <div class="section">
+        <input type="file" id="files" name="files[]" multiple />
+        <img class="loader" src="./loader.svg" alt="Kiwi standing on oval" style="height: 40px;">
+      </div>
+
+      <div class="section">
+        <button style="display:block" onclick="download_zip()">Download</button>
+        <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
+      </div>
+    </div>
+
+
+    <div class="section">
+      <div>הקבצים שבחרתם:</div>
+      <output id="list"></output>
+      <div>הקבצים לאחר עיבוד:</div>
+      <div class="converter-dom-elements-container">
+        <!--  -->
+      </div>
+    </div>
+
+    <div class="section text-align-center">
+      <div class="file-name-status"></div>
+      <div class="progress-status"></div>
+    </div>
+
   </div>
 
-  <div>
-    הכנס מייל:
-    <input type="text" class="email-field"> מאורר מספר
-    <input type="number" min="1" max="6" value="1" class="fan-id">
-  </div>
-
-  <div>
-    <input type="file" id="files" name="files[]" multiple />
-    <output id="list"></output>
-  </div>
-
-  <button style="display:block" onclick="download_zip()">Download</button>
-  <button style="display:block" onclick="handleZipFileUpload()">Upload to server</button>
-
-  <div class="converter-dom-elements-container">
-    <!--  -->
-  </div>
-
-  <div class="text-align-center">
-    <div class="file-name-status"></div>
-    <div class="progress-status"></div>
-  </div>
-
-  <!-- <div class="upload-section"> -->
-  <!-- <button class="file-button">העלה</button> -->
-  <!-- <input type="file" id="csvFileInput" class="display-none" onchange="handleFiles(this.files)"> -->
-  <!-- <div id="dropDiv">Drag & drop your files here!</div> -->
-  <!-- </div> -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
     crossorigin="anonymous"></script>
 
