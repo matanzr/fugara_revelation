@@ -47,10 +47,27 @@ Edit config.txt on sdcard - uncomment `dtparam=spi=on`
     - `pip install pyrebase`
     - `pip install firebase_admin`
 
-- add environment var to pi
-    -  'sudo nano /etc/environment'
-    - SERVER_IP=http://192.168.1.15:3000/
-      FAN_ID=4
+- set environment with fan_id and auto start:
+    - `mkdir logs`
+    - `mkdir launcher`
+    - `nano launcher/launcher.sh` with (change the fan Id):
+
+#~~~ Start Copy From Here ~~~
+#!/bin/sh
+# launcher.sh
+# navigate to home directory, then to this directory, then execute python script, then back home
+
+cd /home/pi/dev/fugara_revelation/led_control
+sudo -H -u pi bash -c 'export FAN_ID=1; export SERVER_IP=http://192.168.1.15:3000/; python fan_client.py'
+#~~~ End Copy Here ~~~
+
+
+    - `chmod 755 launcher.sh`
+
+    - `sudo crontab -e` and add at the end:
+    ``
+
+
 
 
 ## Perparing Content
