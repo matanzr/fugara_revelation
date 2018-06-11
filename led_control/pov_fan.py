@@ -106,7 +106,7 @@ class PovFan:
                         timing["refresh_count"] = 0
                 return magnet_cbk
 
-            magnet = MagnetButton(27)
+            magnet = MagnetButton(16)
             magnet.when_magnet = sync_magnet(timing)
 
             while end_time > timing["last_update"]:
@@ -127,12 +127,12 @@ class PovFan:
                         c = 0
 
                     # TODO: This should run when sensor isn't responding...
-                    timing["last_update"] = time.time()
-                    timing["lapses"] = timing["lapses"] + 1
-                    self.next_image()
-                    if timing["lapses"] % 5 == 0:
-                        print "(speed sensor off) lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
-                        timing["refresh_count"] = 0
+                    # timing["last_update"] = time.time()
+                    # timing["lapses"] = timing["lapses"] + 1
+                    # self.next_image()
+                    # if timing["lapses"] % 5 == 0:
+                    #     print "(speed sensor off) lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
+                    #     timing["refresh_count"] = 0
 
                 self.strip.show(self.column[c])
                 timing["refresh_count"] = timing["refresh_count"] + 1
@@ -149,4 +149,6 @@ class PovFan:
 if __name__ == "__main__":
     fan = PovFan()
     fan.load_sequence("eagle", 1)
-    fan.play(200)
+    fan.play(20)
+    fan.load_sequence("cube", 1)
+    fan.play(20)

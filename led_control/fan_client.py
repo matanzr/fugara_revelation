@@ -6,11 +6,11 @@ import random
 import os
 
 
-server_url = "http://192.168.1.15:3000/"
-try:
-    server_url = os.environ['SERVER_IP']
-except:
-    print "No environment variables for server ip"
+server_url = "http://172.17.0.82:3000" #"http://192.168.1.15:3000/"
+# try:
+#     server_url = os.environ['SERVER_IP']
+# except:
+#     print "No environment variables for server ip"
 
 
 REGISTER = "register"
@@ -35,6 +35,7 @@ class FanClient:
         try:
             return requests.post(server_url + endpoint, data=json.dumps(payload), headers=headers)
         except:
+            print "error in request"
             return "Need Restart";
 
 
@@ -81,10 +82,11 @@ class FanClient:
         print "starting client " + self.fan_id
         while is_registered == False:
             register_fan_res = self.register_fan()
+            print "Attempting to register client " + self.fan_id
             if register_fan_res != "Need Restart":
                 print "register_fan_res"
-                is_registered = register_fan_res;
-            time.sleep(self.interval)
+                is_registered = register_fan_res;            
+            time.sleep(self.interval)            
 
         ### client is running until stopped
         print "Successfuly registered with server"
@@ -110,12 +112,11 @@ class FanClient:
 
             time.sleep(self.interval)
 
-if __name__ == "__main__":
-    client = FanClient(str(random.randint(1,9)*5))
+if __name__ == "__main__":    
     try:
         client = FanClient(os.environ['FAN_ID'])
     except:
-        print "No environment variables for fan id"
+        client = FanClient(str(random.randint(1,9)*5))
 
     client.run()
 
