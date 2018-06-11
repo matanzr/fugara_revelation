@@ -15,9 +15,11 @@ HOST=rev4.local
 
 Echo to remove password use: ssh-copy-id pi@rev4.local
  
-scp -r $LD pi@rev1.local:dev/fugara_revelation/led_control/
-scp -r $LD pi@rev2.local:dev/fugara_revelation/led_control/
-scp -r $LD pi@rev3.local:dev/fugara_revelation/led_control/
-scp -r $LD pi@rev4.local:dev/fugara_revelation/led_control/
-scp -r $LD pi@rev5.local:dev/fugara_revelation/led_control/
-scp -r $LD pi@rev6.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev1.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev2.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev3.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev4.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev5.local:dev/fugara_revelation/led_control/
+# scp -r $LD pi@rev6.local:dev/fugara_revelation/led_control/
+
+rsync -rP --delete $LD pi@rev6.local:dev/fugara_revelation/led_control/
