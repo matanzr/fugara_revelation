@@ -1,6 +1,8 @@
 # Ignore downloaded images.
 led_control/incoming_images
 
+node_modules/
+
 *.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
