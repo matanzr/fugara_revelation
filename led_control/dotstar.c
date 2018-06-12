@@ -526,6 +526,7 @@ static PyObject *prepareBuffer(DotStarObject *self, PyObject *arg) {
 		}
 		
 		PyBuffer_Release(&buf);
+		PyBuffer_Release(&img);
 	}
 
 	Py_INCREF(Py_None);

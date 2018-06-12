@@ -6,7 +6,7 @@ import random
 import os
 
 
-server_url = "http://172.17.0.82:3000" #"http://192.168.1.15:3000/"
+server_url = "http://revmaster.local:3000"
 # try:
 #     server_url = os.environ['SERVER_IP']
 # except:
