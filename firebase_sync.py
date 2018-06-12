@@ -74,15 +74,21 @@ def sync_firebase():
 
   print('lalala.. Done!')
 
-def extract_sequences(): pass
-  # zip_ref = zipfile.ZipFile(local_path, 'r')
-  # zip_ref.extractall(fan_folder)
-  # zip_ref.close()
+def extract_sequences():
+  for seq in glob.glob(os.path.join(TARGET_FOLDER, '*')):
+    if os.path.isdir(seq):
+      for fan_seq in glob.glob(os.path.join(seq, '*')):
+        zips = glob.glob(os.path.join(fan_seq, '*.zip'))
+        if len(zips) > 0: 
+          zip_ref = zipfile.ZipFile(zips[0], 'r')
+          zip_ref.extractall(fan_seq)
+          zip_ref.close()
+          print "extracted ", zips[0]
 
 if __name__ == "__main__":
   if (len(sys.argv) == 2):
     if sys.argv[1] == 'extract':
-      print sys.argv[1]
+      extract_sequences()
     else:
       print """ 
       Usage:
