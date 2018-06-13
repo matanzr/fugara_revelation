@@ -13,7 +13,7 @@ setInterval(function() {
       if (new Date() - new Date(fan.last_ping_date) > 2000) {
         colorSquare = '<font color="orange">▉</font>'
       }
-      if (new Date() - new Date(fan.last_ping_date) > 10000) {
+      if (new Date() - new Date(fan.last_ping_date) > 15000) {
         colorSquare = '<font color="red">▉</font>'
       }
 
