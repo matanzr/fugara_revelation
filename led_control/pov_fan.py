@@ -127,7 +127,7 @@ class PovFan:
                         c = 0
 
                     # TODO: This should run when sensor isn't responding...
-                    # timing["last_update"] = time.time()
+                    timing["last_update"] = time.time()
                     # timing["lapses"] = timing["lapses"] + 1
                     # self.next_image()
                     # if timing["lapses"] % 5 == 0:
@@ -148,7 +148,7 @@ class PovFan:
 
 if __name__ == "__main__":
     fan = PovFan()
-    fan.load_sequence("eagle", 1)
-    fan.play(20)
-    fan.load_sequence("cube", 1)
-    fan.play(20)
+    # fan.load_sequence("eagle", 1)
+    # fan.play(20)
+    # fan.load_sequence("cube", 1)
+    # fan.play(20)
