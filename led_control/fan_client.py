@@ -6,7 +6,7 @@ import random
 import os
 
 
-server_url = "http://revmaster.local:3000"
+server_url = "http://revmaster.local:3000/"
 try:
     server_url = os.environ['SERVER_IP']
 except:
@@ -29,7 +29,7 @@ class FanClient:
         self.action = "idle"
         self.server_ts = 0
 
-        self.fan = PovFan()
+        # self.fan = PovFan()
 
     def send_request(self, endpoint, payload):
         try:
@@ -62,6 +62,7 @@ class FanClient:
 
     def stop_fan(self):
         self.fan.stop()
+        self.fan = None
         self.state = "idle"
 
     def load_sequence(self, name):
@@ -69,6 +70,7 @@ class FanClient:
 
         path = name
         print "loading sequence: ", name
+        self.fan = PovFan()
         self.fan.load_sequence(path, self.fan_id)
         # self.fan.load_sequence("test_images/fugara_test_image_radial.png", self.fan_id)
 
