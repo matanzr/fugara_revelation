@@ -9,7 +9,15 @@ setInterval(function() {
       if (state == "idle") {
         state = "loading"
       }
-      html += "<tr><td>" + fanID + "</td><td>" + state + "</td><td>" + fan.ip + "</td><td>" + fan.last_ping_date + "</td></tr>"
+      var colorSquare = '<font color="green">▉</font>'
+      if (new Date() - new Date(fan.last_ping_date) > 2000) {
+        colorSquare = '<font color="orange">▉</font>'
+      }
+      if (new Date() - new Date(fan.last_ping_date) > 10000) {
+        colorSquare = '<font color="red">▉</font>'
+      }
+
+      html += "<tr><td>" + fanID + "</td><td>" + state + "</td><td>" + fan.ip + "</td><td>" + colorSquare + " " + fan.last_ping_date + "</td></tr>"
     }
     html += "</table>"
     $( ".fans_status" ).html(html);
