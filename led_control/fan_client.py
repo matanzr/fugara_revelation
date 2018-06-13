@@ -7,10 +7,10 @@ import os
 
 
 server_url = "http://revmaster.local:3000"
-# try:
-#     server_url = os.environ['SERVER_IP']
-# except:
-#     print "No environment variables for server ip"
+try:
+    server_url = os.environ['SERVER_IP']
+except:
+    print "No environment variables for server ip"
 
 
 REGISTER = "register"
@@ -85,8 +85,8 @@ class FanClient:
             print "Attempting to register client " + self.fan_id
             if register_fan_res != "Need Restart":
                 print "register_fan_res"
-                is_registered = register_fan_res;            
-            time.sleep(self.interval)            
+                is_registered = register_fan_res;
+            time.sleep(self.interval)
 
         ### client is running until stopped
         print "Successfuly registered with server"
@@ -112,7 +112,7 @@ class FanClient:
 
             time.sleep(self.interval)
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     try:
         client = FanClient(os.environ['FAN_ID'])
     except:
