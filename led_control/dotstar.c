@@ -195,7 +195,7 @@ static PyObject *DotStar_new(
 	uint8_t        rOffset = 2, gOffset = 3, bOffset = 1; // BRG default
 
 	for (int i=0; i < 256; i++) {
-		gamma_lu[i] = (uint8_t)(pow((float)i / 255.0, 2.7) * 255.0 + 0.5);
+		gamma_lu[i] = (uint8_t)(pow((float)i / 255.0, 2.5) * 255.0 + 0.5);
 	}
 	
 
