@@ -158,7 +158,7 @@ class PovFan:
 
 if __name__ == "__main__":
     fan = PovFan()
-    # fan.load_sequence("eagle", 1)
-    # fan.play(20)
+    fan.load_sequence("eagle", 1)
+    fan.play(20)
     # fan.load_sequence("cube", 1)
     # fan.play(20)
