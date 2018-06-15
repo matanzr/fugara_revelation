@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from pov_fan import PovFan
+from utility_fan import UtilityFan
 import random
 import os
 
@@ -28,8 +29,9 @@ class FanClient:
         self.state = "idle"
         self.action = "idle"
         self.server_ts = 0
-
-        # self.fan = PovFan()
+        
+        self.fan = None
+        self.utility_fan = UtilityFan()
 
     def send_request(self, endpoint, payload):
         try:
@@ -72,7 +74,6 @@ class FanClient:
         print "loading sequence: ", name
         self.fan = PovFan()
         self.fan.load_sequence(path, self.fan_id)
-        # self.fan.load_sequence("test_images/fugara_test_image_radial.png", self.fan_id)
 
         self.state = "loaded"
 
@@ -88,7 +89,7 @@ class FanClient:
             if register_fan_res != "Need Restart":
                 print "register_fan_res"
                 is_registered = register_fan_res;
-            time.sleep(self.interval)
+            self.utility_fan.next(self.interval)
 
         ### client is running until stopped
         print "Successfuly registered with server"
@@ -108,11 +109,17 @@ class FanClient:
 
                 self.action = next_state["action"]
 
-                if self.action == "load": self.load_sequence(next_state["animation"])
-                if self.action == "idle": self.stop_fan()
-                if self.action == "draw": self.play_fan()
+                if self.action == "load": 
+                    self.load_sequence(next_state["animation"])
 
-            time.sleep(self.interval)
+                if self.action == "idle": 
+                    self.stop_fan()
+
+                if self.action == "draw": 
+                    self.play_fan()
+
+            self.utility_fan.next(self.interval) # instead of sleeping, use utility fan to show content        
+            # time.sleep(self.interval)
 
 if __name__ == "__main__":
     try:

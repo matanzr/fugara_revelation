@@ -28,8 +28,7 @@ class PovFan:
         self.cur_column = 0
 
         if is_running_on_pi:
-            self.strip = Adafruit_DotStar(0, datapin, clockpin, 18500000)
-            self.strip.begin()
+            self.strip = Adafruit_DotStar(0, datapin, clockpin, 18500000)            
         else:
             self.strip = None
 
@@ -62,6 +61,12 @@ class PovFan:
 
         img.close()
 
+    def disabled_animation(): pass
+    
+    def clear_fan(): pass
+
+    def loading_animation(): pass
+
     #TODO: set sequence length
     def load_sequence(self, sequence_path, fan_id, seq_size = -1):
         if is_running_on_pi == False:
@@ -82,9 +87,11 @@ class PovFan:
         print "showing frame #",self.cur_column
 
     def play(self, length):
-        if is_running_on_pi == False:
-            # print "play"
+        if is_running_on_pi == False:            
             return
+
+        self.strip.begin()
+
         end_time = length + time.time()
         self.column = self.sequence[self.cur_column]
 
@@ -142,9 +149,12 @@ class PovFan:
         else:
             while end_time > timing["last_update"]:
                 timing["last_update"] = time.time()
+        
+        self.strip.close()
 
     def stop(self):
-        pass
+        self.strip.clear()
+        self.strip.close()
 
 if __name__ == "__main__":
     fan = PovFan()
