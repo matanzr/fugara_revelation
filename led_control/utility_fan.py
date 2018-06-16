@@ -60,8 +60,11 @@ class UtilityFan:
         
         self.strip.close()
 
+    def clear(self):
+        self.strip.begin()        
+        self.strip.clear()
+        self.strip.close()
+
 if __name__ == "__main__":
     uf = UtilityFan()
-
-    
     uf.next(10)

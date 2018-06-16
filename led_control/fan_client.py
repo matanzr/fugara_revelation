@@ -25,7 +25,7 @@ class FanClient:
     def __init__(self, fan_id):
         self.is_running = False
         self.fan_id = fan_id
-        self.interval = 0.5
+        self.interval = 1
         self.state = "idle"
         self.action = "idle"
         self.server_ts = 0
@@ -68,6 +68,7 @@ class FanClient:
         self.state = "idle"
 
     def load_sequence(self, name):
+        self.utility_fan.clear()
         self.state = "loading"
 
         path = name
@@ -115,8 +116,8 @@ class FanClient:
                 if self.action == "idle": 
                     self.stop_fan()
 
-                if self.action == "draw": 
-                    self.play_fan()
+                if self.action == "draw":                     
+                    self.play_fan(next_state["length"])
 
             self.utility_fan.next(self.interval) # instead of sleeping, use utility fan to show content        
             # time.sleep(self.interval)
