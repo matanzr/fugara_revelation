@@ -1,7 +1,7 @@
 var save = false;
 
 var canvas, ctx, myImageData;
-var targetImageColumns = 400;
+var targetImageColumns = 200;
 var output_div;
 
 function downloadURI(uri, name) {
@@ -30,7 +30,7 @@ function load_next() {
 img.onload = function() {
   // canvas2 = document.getElementById('canvas2');
   var canvas2 = document.createElement("canvas");
-  canvas2.setAttribute("width", 400);
+  canvas2.setAttribute("width", targetImageColumns);
   canvas2.setAttribute("height", 144);
   canvas2.setAttribute("id", img.getAttribute("id"));
 
@@ -48,8 +48,8 @@ img.onload = function() {
     target_imageDiameter
   );
   var new_data = myImageData.data;
-  var theta = 0;
-  var theta_increment = 2 * Math.PI / targetImageColumns;
+  var theta = Math.PI / 2;
+  var theta_increment = Math.PI / targetImageColumns;
   for (var j = 0; j < targetImageColumns; j++) {
     var dx = Math.cos(theta);
     var dy = Math.sin(theta);

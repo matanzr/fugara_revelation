@@ -9,12 +9,21 @@ app.use('/', express.static('public'))
 
 
 
-
+var max_timeout = 30;
 var playlist = [
-  { asset: "eagle", duration: 20 },
-  { asset: "cube", duration: 20 },
-  { asset: "tunnel", duration: 20 },
+  { asset: "eagle", duration: 40 },
+  { asset: "cube", duration: 40 },
+  { asset: "tunnel", duration: 40 },
+  { asset: "testgif1", duration: 40 },
+  { asset: "testgif2", duration: 40 },
+  { asset: "testgif3", duration: 40 }
 ];
+
+for (var i=0; i < playlist.length; i++) {
+  max_timeout = Math.max(playlist[i].duration, max_timeout);
+}
+max_timeout = (max_timeout + 5) * 1000;
+
 var current_asset_index = 0;
 var current_server_state = "fans_stopped"; //'fans_stopped'\'fans_loading'\'fans_drawing'
 var current_animation_starting_time;
@@ -90,7 +99,7 @@ app.post('/action', (req, res) => {
             console.log("Telling fans to Stop")
             current_server_state = 'fans_stopped';
         }
-				return res.json({ status: 'success', action: 'draw', animation: playlist[current_asset_index].asset });
+				return res.json({ status: 'success', action: 'draw', animation: playlist[current_asset_index].asset, length: playlist[current_asset_index].duration });
 			}
 });
 
@@ -127,7 +136,7 @@ setInterval(function() {
         all_in_connected_state = false;
     }
     var should_remove = false;
-    if (new Date() - online_fans[fanID].last_ping_date > 30000) { should_remove = true; }
+    if (new Date() - online_fans[fanID].last_ping_date > max_timeout) { should_remove = true; }
     if (should_remove) {
       delete online_fans[fanID];
       console.log("Removed fan with id: " + fanID);
