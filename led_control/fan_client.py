@@ -13,6 +13,7 @@ try:
 except:
     print "No environment variables for server ip"
 
+print "starting client - server ip ", server_url
 
 REGISTER = "register"
 ACTION = "action"
@@ -61,6 +62,7 @@ class FanClient:
     def play_fan(self, length = 1):
         self.state = "drawing"
         self.fan.play(length)
+        self.state = "idle"
 
     def stop_fan(self):
         self.fan.stop()
@@ -119,8 +121,7 @@ class FanClient:
                 if self.action == "draw":                     
                     self.play_fan(next_state["length"])
 
-            self.utility_fan.next(self.interval) # instead of sleeping, use utility fan to show content        
-            # time.sleep(self.interval)
+            self.utility_fan.next(self.interval) # instead of sleeping, use utility fan to show content                    
 
 if __name__ == "__main__":
     try:
