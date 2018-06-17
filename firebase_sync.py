@@ -10,7 +10,7 @@ import glob
 TARGET_FOLDER = os.path.join("led_control", "incoming_images")
 
 
-def sync_firebase():
+def sync_firebase(force_update):
   import pyrebase
   import firebase_admin
   from firebase_admin import credentials
@@ -42,9 +42,10 @@ def sync_firebase():
   print json.dumps(file_structure.val())
 
   # clean
-  if os.path.exists(TARGET_FOLDER):
-    shutil.rmtree(TARGET_FOLDER)
-  os.mkdir(TARGET_FOLDER)
+  if force_update:
+    if os.path.exists(TARGET_FOLDER):
+      shutil.rmtree(TARGET_FOLDER)
+    os.mkdir(TARGET_FOLDER)
 
   file = open( os.path.join(TARGET_FOLDER, "README.md"), "w")
   file.write("This folder is for incoming images downloaded by 'firebase_sync.py'")
@@ -64,12 +65,15 @@ def sync_firebase():
       firebase_path = os.path.join(firebase_folder, fan_file)
       local_path = os.path.join(fan_folder, fan_file)
 
-      try:
-        storage.child(firebase_path).download(local_path)
-        print "Got firebase_path: %s, written local_path: %s" % (firebase_path, local_path)      
+      if not os.path.isfile(local_path) or force_update: 
+        try:
+          storage.child(firebase_path).download(local_path)
+          print "Got firebase_path: %s, written local_path: %s" % (firebase_path, local_path)      
 
-      except Exception as e:
-        print fan_file, "download failed. exception: %s" % (sys.exc_info()[0])
+        except Exception as e:
+          print local_path, "download failed. exception: %s" % (sys.exc_info()[0])
+      else:
+        print local_path," exists. skipping"
 
 
   print('lalala.. Done!')
@@ -89,6 +93,8 @@ if __name__ == "__main__":
   if (len(sys.argv) == 2):
     if sys.argv[1] == 'extract':
       extract_sequences()
+    if sys.argv[1] == 'force':
+      sync_firebase(True)
     else:
       print """ 
       Usage:
@@ -96,5 +102,5 @@ if __name__ == "__main__":
       - extract: attempt to extract all zip files in TARGET_FOLDER
       """
   else:
-    sync_firebase()
+    sync_firebase(False)
   
