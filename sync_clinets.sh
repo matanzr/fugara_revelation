@@ -10,7 +10,7 @@ ID=~/.ssh/id_rsa
 # USERname to login as
 USER=pi
 FLAGS="-avh --delete"
-PATH=~/dev/fugara_revelation 
+FUPATH=~/dev/fugara_revelation 
 
 clients=( rev1.local rev2.local rev3.local rev4.local rev5.local rev6.local rev7.local)
 
@@ -29,21 +29,21 @@ sync() {
 
     for i in "${clients[@]}"
     do
-        echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd $PATH && python firebase_sync.py extract' &
-        ssh -o ConnectTimeout=1 -q $USER@$i  'cd $PATH && python firebase_sync.py extract' &
+        echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd $FUPATH && python firebase_sync.py extract' &
+        ssh -o ConnectTimeout=1 -q $USER@$i  'cd $FUPATH && python firebase_sync.py extract' &
     done
 
     wait
 }
 
 download() {
-    cd $PATH && python firebase_sync.py
+    cd $FUPATH && python firebase_sync.py
 }
 
 stop() {
     for i in "${clients[@]}"
     do
-        echo ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+        echo ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python'&
         ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
     done
 }
@@ -73,7 +73,7 @@ restart() {
 make() {
     for i in "${clients[@]}"
     do
-        ssh $USER@$1 'cd $PATH && make && exit' &
+        ssh $USER@$1 'cd $FUPATH && make && exit' &
     done
 }
 
