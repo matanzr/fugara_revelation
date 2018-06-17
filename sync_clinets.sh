@@ -10,6 +10,7 @@ ID=~/.ssh/id_rsa
 # USERname to login as
 USER=pi
 FLAGS="-avh --delete"
+PATH=~/dev/fugara_revelation 
 
 clients=( rev1.local rev2.local rev3.local rev4.local rev5.local rev6.local rev7.local)
 
@@ -18,74 +19,86 @@ clients=( rev1.local rev2.local rev3.local rev4.local rev5.local rev6.local rev7
 echo to remove password use: ssh-copy-id pi@rev4.local
 
 sync() {
-    rsync $FLAGS --exclude='*.png' $FROM $USER@rev1.local:$TO &
-    # rsync $FLAGS --exclude='*.png' $FROM $USER@rev2.local:$TO &
-    # rsync $FLAGS --exclude='*.png' $FROM $USER@rev3.local:$TO &
-    # rsync $FLAGS --exclude='*.png' $FROM $USER@rev4.local:$TO &
-    # rsync $FLAGS --exclude='*.png' $FROM $USER@rev5.local:$TO &
-    # rsync $FLAGS --exclude='*.png' $FROM $USER@rev6.local:$TO &
+    for i in "${clients[@]}"
+    do
+        echo rsync $FLAGS --exclude='*.png' $FROM $USER@$1:$TO &
+        rsync $FLAGS --exclude='*.png' $FROM $USER@$1:$TO &
+    done
+    
     wait
 
-    ssh pi@rev1.local 'cd dev/fugara_revelation && python firebase_sync.py extract' &
-    # ssh pi@rev2.local 'cd dev/fugara_revelation && python firebase_sync.py extract' &
-    # ssh pi@rev3.local 'cd dev/fugara_revelation && python firebase_sync.py extract' &
-    # ssh pi@rev4.local 'cd dev/fugara_revelation && python firebase_sync.py extract' &
-    # ssh pi@rev5.local 'cd dev/fugara_revelation && python firebase_sync.py extract' &
-    # ssh pi@rev6.local 'cd dev/fugara_revelation && python firebase_sync.py extract' & 
+    for i in "${clients[@]}"
+    do
+        echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd $PATH && python firebase_sync.py extract' &
+        ssh -o ConnectTimeout=1 -q $USER@$i  'cd $PATH && python firebase_sync.py extract' &
+    done
+
     wait
+}
+
+download() {
+    cd $PATH && python firebase_sync.py
 }
 
 stop() {
-    ssh pi@rev1.local 'sudo pkill -f python'
+    for i in "${clients[@]}"
+    do
+        echo ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+        ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+    done
 }
 
 start() {
-    ssh pi@rev1.local './launcher/launcher.sh'
+    for i in "${clients[@]}"
+    do
+        echo ssh -o ConnectTimeout=1 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
+        ssh -o ConnectTimeout=1 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
+    done
 }
 
 git_pull() {
-    ssh $USER@$1 'cd dev/fugara_revelation/led_control && make' &
+    for i in "${clients[@]}"
+    do
+        echo ssh $USER@$1 'cd dev/fugara_revelation/led_control && git pull' &
+        ssh $USER@$1 'cd dev/fugara_revelation/led_control && git pull' &
+    done
 }
 
-reboot() {
-    ssh $1 'sudo reboot' &
+restart() {
+    stop
+    wait
+    start
 }
 
 make() {
-    ssh $USER@$1 'cd dev/fugara_revelation/led_control && make' &
+    for i in "${clients[@]}"
+    do
+        ssh $USER@$1 'cd $PATH && make && exit' &
+    done
 }
 
 ping() {
-    ping -c 1 -W 1 rev1.local
+    for i in "${clients[@]}"
+    do
+        ping -c 1 -W 1 $1 &
+    done
     # if [ $? -eq 0 ]
     # then
     #     echo $1 "Pingable"
     # else
     #     echo $1 "Not Pingable"
     # fi
-    
-    # ping -c 1 -W 1 rev1.local ; echo $? & 
-    # ping -c 1 -W 1 rev2.local ; echo $? &
-    # ping -c 1 -W 1 rev3.local ; echo $? &
-    # ping -c 1 -W 1 rev4.local ; echo $? &
-    # ping -c 1 -W 1 rev5.local ; echo $? &
-    # ping -c 1 -W 1 rev6.local ; echo $? &
 }
-sync
-# if declare -f "$1" > /dev/null
-# then
-#   # call arguments verbatim
-#   for i in "${clients[@]}"
-#     do
-#         "$@" $i  
-#     done
-#     wait
 
+if declare -f "$1" > /dev/null
+then
+    "$@"
 
-# else
-#   # Show a helpful error
-#   echo "'$1' is not a known function name" >&2
-#   echo "Options: make, reboot, git_pull, sync, ping"
-#   exit 1
-# fi
+else
+  # Show a helpful error
+  echo "'$1' is not a known function name" >&2
+  echo "Options:"
+  "make, reboot, git_pull, sync, ping, start, stop, restart, download"
+  exit 1
+fi
 
