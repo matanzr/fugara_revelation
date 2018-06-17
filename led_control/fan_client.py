@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from pov_fan import PovFan
+from utility_fan import UtilityFan
 import random
 import os
 
@@ -12,6 +13,7 @@ try:
 except:
     print "No environment variables for server ip"
 
+print "starting client - server ip ", server_url
 
 REGISTER = "register"
 ACTION = "action"
@@ -24,12 +26,13 @@ class FanClient:
     def __init__(self, fan_id):
         self.is_running = False
         self.fan_id = fan_id
-        self.interval = 0.5
+        self.interval = 1
         self.state = "idle"
         self.action = "idle"
         self.server_ts = 0
-
-        # self.fan = PovFan()
+        
+        self.fan = None
+        self.utility_fan = UtilityFan()
 
     def send_request(self, endpoint, payload):
         try:
@@ -59,6 +62,7 @@ class FanClient:
     def play_fan(self, length = 1):
         self.state = "drawing"
         self.fan.play(length)
+        self.state = "idle"
 
     def stop_fan(self):
         self.fan.stop()
@@ -66,13 +70,13 @@ class FanClient:
         self.state = "idle"
 
     def load_sequence(self, name):
+        self.utility_fan.clear()
         self.state = "loading"
 
         path = name
         print "loading sequence: ", name
         self.fan = PovFan()
         self.fan.load_sequence(path, self.fan_id)
-        # self.fan.load_sequence("test_images/fugara_test_image_radial.png", self.fan_id)
 
         self.state = "loaded"
 
@@ -88,7 +92,7 @@ class FanClient:
             if register_fan_res != "Need Restart":
                 print "register_fan_res"
                 is_registered = register_fan_res;
-            time.sleep(self.interval)
+            self.utility_fan.next(self.interval)
 
         ### client is running until stopped
         print "Successfuly registered with server"
@@ -108,11 +112,16 @@ class FanClient:
 
                 self.action = next_state["action"]
 
-                if self.action == "load": self.load_sequence(next_state["animation"])
-                if self.action == "idle": self.stop_fan()
-                if self.action == "draw": self.play_fan()
+                if self.action == "load": 
+                    self.load_sequence(next_state["animation"])
 
-            time.sleep(self.interval)
+                if self.action == "idle": 
+                    self.stop_fan()
+
+                if self.action == "draw":                     
+                    self.play_fan(next_state["length"])
+
+            self.utility_fan.next(self.interval) # instead of sleeping, use utility fan to show content                    
 
 if __name__ == "__main__":
     try:

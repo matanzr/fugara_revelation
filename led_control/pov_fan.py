@@ -28,12 +28,11 @@ class PovFan:
         self.cur_column = 0
 
         if is_running_on_pi:
-            self.strip = Adafruit_DotStar(0, datapin, clockpin, 18500000)
-            self.strip.begin()
+            self.strip = Adafruit_DotStar(0, datapin, clockpin, 18500000)            
         else:
             self.strip = None
 
-    def add_image(self, image_path):
+    def add_image(self, image_path, reverse):
         if is_running_on_pi == False:
             # print "add_image"
             return
@@ -55,12 +54,18 @@ class PovFan:
         for x in range(width):
             offset = x * 3
             multiplier = width * 3
-            self.strip.prepareBuffer(column[x], bytess, offset, multiplier);
+            self.strip.prepareBuffer(column[x], bytess, offset, multiplier, reverse)
 
         self.sequence.append(column)
         self.width = width
 
         img.close()
+
+    def disabled_animation(): pass
+    
+    def clear_fan(): pass
+
+    def loading_animation(): pass
 
     #TODO: set sequence length
     def load_sequence(self, sequence_path, fan_id, seq_size = -1):
@@ -70,9 +75,10 @@ class PovFan:
         start = time.time()
         path = os.path.join('incoming_images', sequence_path, "fan_"+str(fan_id))
         files = sorted( glob.glob( os.path.join(path, "*.png") ))
-        for i in files:
+        
+        for i in range(len(files)):
             print "loading image ", i
-            self.add_image(i)
+            self.add_image(files[i], i%2)
 
         print "loading took ", time.time() - start
 
@@ -81,26 +87,52 @@ class PovFan:
         self.column = self.sequence[self.cur_column]
         print "showing frame #",self.cur_column
 
-    def play(self, length):
-        if is_running_on_pi == False:
-            # print "play"
-            return
-        end_time = length + time.time()
-        self.column = self.sequence[self.cur_column]
+    def no_magnet_callback(self, timing):
+        timing["lapse_time"] = timing["no_magnet_lapse_time"]
+        timing["last_update"] = time.time()
+        timing["lapses"] = timing["lapses"] + 1
+        timing["need_swap"] = 0
+        if timing["lapses"] % 10 == 0:
+            print "MAGNET SENSOR INACTIVE! FALLBACK ESTIMATING SPEED"
+            print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
+            print "lapse time", timing["lapse_time"]
+            timing["refresh_count"] = 0
 
-        timing = {"lapse_time": 0.2, "last_update": time.time(), "lapses": 0, "refresh_count": 0, "need_swap": 0}
+    def play(self, length):
+        if is_running_on_pi == False:            
+            return
+
+        self.strip.begin()
+
+        end_time = length + time.time()
+        PIXELS_IN_CIRCLE = 2 * self.width
+        self.column = self.sequence[self.cur_column]        
+
+        timing = {
+            "lapse_time": 0.18,             # time to complete lapse
+            "last_update": time.time(),     # last frame time
+            "lapses": 0,                    # number of whole rotations (or every magnet on)
+            "refresh_count": 0,             # number of columns showed
+            "need_swap": 0,                 # track for estimating mid-lapse image swap
+            "max_lapse_time": 0.21,          # max time allowed before force swap
+            "use_magnet": True,
+            "no_magnet_lapse_time": 0.17
+            }
 
         print "playing sequence for ", length, "seconds"
         if is_running_on_pi:
             def sync_magnet(counter):
                 a = timing
 
-                def magnet_cbk(m):
+                def magnet_cbk(m):                    
+                    if not timing["use_magnet"]: 
+                        return
+
                     timing["lapse_time"] = m.estimated_rpm()
                     timing["last_update"] = time.time()
                     timing["lapses"] = timing["lapses"] + 1
                     timing["need_swap"] = 0
-                    if timing["lapses"] % 5 == 0:
+                    if timing["lapses"] % 10 == 0:
                         print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
                         print "lapse time", timing["lapse_time"]
                         timing["refresh_count"] = 0
@@ -108,31 +140,29 @@ class PovFan:
 
             magnet = MagnetButton(16)
             magnet.when_magnet = sync_magnet(timing)
+            magnet.set_timeout(timing["max_lapse_time"])
 
             while end_time > timing["last_update"]:
+                timing["use_magnet"] = not (magnet.is_not_responding())
+
+                if not timing["use_magnet"]:
+                    if time.time() > timing["last_update"] + timing["no_magnet_lapse_time"]:
+                        self.no_magnet_callback(timing)
+            
                 if timing["need_swap"] == 0:
                     self.next_image()
                     timing["need_swap"] = 1
 
-                c = int(self.width * (time.time() - timing["last_update"]) / timing["lapse_time"])
+                c = int(PIXELS_IN_CIRCLE * (time.time() - timing["last_update"]) / timing["lapse_time"])
 
                 # TODO: make this cleaner...
-                if c >= (self.width / 2):
+                if c >= (self.width):
                     if timing["need_swap"] == 1:
                         self.next_image()
                         timing["need_swap"] = 2
 
                     ## if overflowing since lapse is longer now
-                    if c >= self.width:
-                        c = 0
-
-                    # TODO: This should run when sensor isn't responding...
-                    timing["last_update"] = time.time()
-                    # timing["lapses"] = timing["lapses"] + 1
-                    # self.next_image()
-                    # if timing["lapses"] % 5 == 0:
-                    #     print "(speed sensor off) lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
-                    #     timing["refresh_count"] = 0
+                    c = c % self.width                    
 
                 self.strip.show(self.column[c])
                 timing["refresh_count"] = timing["refresh_count"] + 1
@@ -142,13 +172,19 @@ class PovFan:
         else:
             while end_time > timing["last_update"]:
                 timing["last_update"] = time.time()
+        
+        self.strip.close()
 
     def stop(self):
-        pass
+        self.strip.clear()
+        self.strip.close()
 
 if __name__ == "__main__":
-    fan = PovFan()
-    # fan.load_sequence("eagle", 1)
-    # fan.play(20)
-    # fan.load_sequence("cube", 1)
-    # fan.play(20)
+    while 1:
+        fan = PovFan()
+        # fan.load_sequence("testgif1", 1)
+        # fan.play(60)
+        # fan.load_sequence("testgif2", 1)
+        # fan.play(60)
+        fan.load_sequence("cube2", 1)
+        fan.play(60)

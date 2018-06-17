@@ -14,9 +14,13 @@ class MagnetButton(HoldMixin, DigitalInputDevice):
         self._prev_change = time.time()
         self.when_activated = self.on_magnet
         self.when_magnet = None
+        self.ttl = 0.2
 
         self.last_k = deque()
     
+    def set_timeout(self, timeout):
+        self.ttl = timeout
+
     def on_magnet(self, btn):
         self.last_k.append(self._last_changed - self._prev_change)
         if (len(self.last_k) > 9):
@@ -31,10 +35,14 @@ class MagnetButton(HoldMixin, DigitalInputDevice):
         for i in self.last_k:
             avg += i
         return avg / float(len(self.last_k))
-
+    
+    def is_not_responding(self):
+        if len(self.last_k) == 0: return True
+        
+        return self.ttl < self.last_k[-1]
 
 if __name__ == "__main__":
-    button = MagnetButton(27)
+    button = MagnetButton(16)
 
     while True:
         print button.last_k
