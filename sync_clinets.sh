@@ -27,10 +27,13 @@ sync() {
     
     wait
 
+    counter=1
     for i in "${clients[@]}"
     do
-        echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract' &
-        # ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract $i' &
+        echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract' $counter &
+        ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract ' $counter &
+
+        counter=$((counter+1))
     done
 
     wait
