@@ -78,7 +78,7 @@ def sync_firebase(force_update):
 
   print('lalala.. Done!')
 
-def extract_sequences():
+def extract_all_sequences():
   for seq in glob.glob(os.path.join(TARGET_FOLDER, '*')):
     if os.path.isdir(seq):
       for fan_seq in glob.glob(os.path.join(seq, '*')):
@@ -89,10 +89,22 @@ def extract_sequences():
           zip_ref.close()
           print "extracted ", zips[0]
 
+def extract_selective_sequences(fans_list):
+  for seq in glob.glob(os.path.join(TARGET_FOLDER, '*')):
+    if os.path.isdir(seq):
+      for fan_seq in glob.glob(os.path.join(seq, '*')):
+        zips = glob.glob(os.path.join(fan_seq, '*'+fans_list+'.zip'))
+        if len(zips) > 0: 
+          zip_ref = zipfile.ZipFile(zips[0], 'r')
+          zip_ref.extractall(fan_seq)
+          zip_ref.close()
+          print "extracted ", zips[0]
+
+
 if __name__ == "__main__":
   if (len(sys.argv) == 2):
     if sys.argv[1] == 'extract':
-      extract_sequences()
+      extract_all_sequences()
     if sys.argv[1] == 'force':
       sync_firebase(True)
     else:
@@ -101,6 +113,9 @@ if __name__ == "__main__":
       - no args syncs from firebase
       - extract: attempt to extract all zip files in TARGET_FOLDER
       """
+  elif (len(sys.argv) == 3):
+    if sys.argv[1] == 'extract': 
+      extract_selective_sequences(sys.argv[2])
   else:
     sync_firebase(False)
   

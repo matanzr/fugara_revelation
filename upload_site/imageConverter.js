@@ -48,7 +48,7 @@ img.onload = function() {
     target_imageDiameter
   );
   var new_data = myImageData.data;
-  var theta = Math.PI / 2;
+  var theta = -Math.PI / 2;
   var theta_increment = Math.PI / targetImageColumns;
   for (var j = 0; j < targetImageColumns; j++) {
     var dx = Math.cos(theta);
