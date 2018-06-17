@@ -32,7 +32,7 @@ class PovFan:
         else:
             self.strip = None
 
-    def add_image(self, image_path):
+    def add_image(self, image_path, reverse):
         if is_running_on_pi == False:
             # print "add_image"
             return
@@ -54,7 +54,7 @@ class PovFan:
         for x in range(width):
             offset = x * 3
             multiplier = width * 3
-            self.strip.prepareBuffer(column[x], bytess, offset, multiplier);
+            self.strip.prepareBuffer(column[x], bytess, offset, multiplier, reverse)
 
         self.sequence.append(column)
         self.width = width
@@ -75,9 +75,10 @@ class PovFan:
         start = time.time()
         path = os.path.join('incoming_images', sequence_path, "fan_"+str(fan_id))
         files = sorted( glob.glob( os.path.join(path, "*.png") ))
-        for i in files:
+        
+        for i in range(len(files)):
             print "loading image ", i
-            self.add_image(i)
+            self.add_image(files[i], i%2)
 
         print "loading took ", time.time() - start
 
@@ -104,7 +105,8 @@ class PovFan:
         self.strip.begin()
 
         end_time = length + time.time()
-        self.column = self.sequence[self.cur_column]
+        PIXELS_IN_CIRCLE = 2 * self.width
+        self.column = self.sequence[self.cur_column]        
 
         timing = {
             "lapse_time": 0.18,             # time to complete lapse
@@ -151,17 +153,16 @@ class PovFan:
                     self.next_image()
                     timing["need_swap"] = 1
 
-                c = int(self.width * (time.time() - timing["last_update"]) / timing["lapse_time"])
+                c = int(PIXELS_IN_CIRCLE * (time.time() - timing["last_update"]) / timing["lapse_time"])
 
                 # TODO: make this cleaner...
-                if c >= (self.width / 2):
+                if c >= (self.width):
                     if timing["need_swap"] == 1:
                         self.next_image()
                         timing["need_swap"] = 2
 
                     ## if overflowing since lapse is longer now
-                    if c >= self.width:
-                        c = c - self.width   
+                    c = c % self.width                    
 
                 self.strip.show(self.column[c])
                 timing["refresh_count"] = timing["refresh_count"] + 1
@@ -185,5 +186,5 @@ if __name__ == "__main__":
         # fan.play(60)
         # fan.load_sequence("testgif2", 1)
         # fan.play(60)
-        fan.load_sequence("testgif3", 1)
+        fan.load_sequence("cube2", 1)
         fan.play(60)
