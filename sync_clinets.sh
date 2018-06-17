@@ -20,9 +20,9 @@ echo to remove password use: ssh-copy-id pi@rev4.local
 
 sync() {
     for i in "${clients[@]}"
-    do
-        echo rsync $FLAGS --exclude='*.png' $FROM $USER@$1:$TO &
-        rsync $FLAGS --exclude='*.png' $FROM $USER@$1:$TO &
+    do        
+        echo rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &
+        rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &
     done
     
     wait
@@ -59,8 +59,8 @@ start() {
 git_pull() {
     for i in "${clients[@]}"
     do
-        echo ssh $USER@$1 'cd dev/fugara_revelation/led_control && git pull' &
-        ssh $USER@$1 'cd dev/fugara_revelation/led_control && git pull' &
+        echo ssh $USER@$i 'cd dev/fugara_revelation/led_control && git pull' &
+        ssh $USER@$i 'cd dev/fugara_revelation/led_control && git pull' &
     done
 }
 
@@ -73,7 +73,7 @@ restart() {
 make() {
     for i in "${clients[@]}"
     do
-        ssh $USER@$1 'cd $FUPATH && make && exit' &
+        ssh $USER@$i 'cd $FUPATH && make && exit' &
     done
 }
 
