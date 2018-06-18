@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+var fs = require('fs');
+
 var bodyParser = require('body-parser')
 const exec = require('child_process').exec;
 
@@ -11,6 +13,14 @@ app.use('/', express.static('public'))
 
 
 var max_timeout = 30;
+
+var playlist = []
+fs.readFile('./playlist.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    playlist = JSON.parse(data);
+  }
+);
+
 var playlist = [
   { asset: "eagle", duration: 40 },
   { asset: "cube", duration: 40 },
@@ -114,6 +124,15 @@ app.get('/status', (req, res) => {
     });
 });
 
+app.post('/update_playlist', (req,res) => {
+  playlist = req.body['playlist'];
+  fs.writeFile ('./playlist.json', (JSON.stringify(playlist)), function(err) {
+    if (err) throw err;
+    console.log('complete');
+  }
+  );
+});
+
 
 app.get('/server_command', (req, res) => {
   exec('../sync_clinets.sh', (e, stdout, stderr)=> {
@@ -126,7 +145,7 @@ app.get('/server_command', (req, res) => {
   });
 
   res.json({
-    
+
   });
 });
 
