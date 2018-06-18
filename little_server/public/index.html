@@ -2,8 +2,9 @@
   <head>
     <title>Fan's Dashboard</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
+    <link rel="stylesheet" href="bootstrap.min.css" crossorigin="anonymous">
     <style>
+
       table {
           border-collapse: collapse;
           width: 100%;
@@ -18,12 +19,34 @@
   </head>
   <body>
     <center><h1>Dashboard</h1></center>
+    <div class="container">
     <h3>Server status</h3>
+
+    <div class="row">
+      <div class="col-xs-4">Clients (affect all connected fans):</div>
+      <div class="col-xs-8">
+          <button>Stop</button>
+          <button>Start</button>
+          <button>Reset</button>
+          <button>Sync Sequences</button>
+      </div>
+      
+    </div>
+      <div class="row">
+          <div class="col-xs-4">Server:</div>
+          <div class="col-xs-8">
+              <button>Download Sequences</button>      
+          </div>
+      </div>
+      
+      
+    
+
     <div class="server_status"></div>
     <center><div class="gif"></div></center>
     <h3>Fans status</h3>
     <div class="fans_status"></div>
-
+  </div>
 
     <script type="text/javascript" src="status_page.js"></script>
   </body>

@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 var bodyParser = require('body-parser')
+const exec = require('child_process').exec;
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -111,6 +112,22 @@ app.get('/status', (req, res) => {
       playlist: playlist,
       online_fans: online_fans
     });
+});
+
+
+app.get('/server_command', (req, res) => {
+  exec('../sync_clinets.sh', (e, stdout, stderr)=> {
+    // if (e instanceof Error) {
+    //     console.error(e);
+    //     throw e;
+    // }
+    console.log('stdout ', stdout);
+    console.log('stderr ', stderr);
+  });
+
+  res.json({
+    
+  });
 });
 
 app.listen(3000, () => console.log('Listening on port 3000'))
