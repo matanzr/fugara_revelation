@@ -10,8 +10,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', express.static('public'))
 
-
-
 var max_timeout = 30;
 
 var playlist = []
@@ -126,6 +124,10 @@ app.get('/status', (req, res) => {
 
 app.post('/update_playlist', (req,res) => {
   playlist = req.body['playlist'];
+  for (var i =0; i< playlist.length; i++) {
+    playlist[i].duration = parseInt(playlist[i].duration)
+  }
+  console.log(playlist);
   fs.writeFile ('./playlist.json', (JSON.stringify(playlist)), function(err) {
     if (err) throw err;
     console.log('complete');
