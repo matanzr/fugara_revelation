@@ -59,3 +59,8 @@ setInterval(function() {
     $( ".gif" ).html(gifhtml);
   });
 }, 15000);
+
+
+function send_command(command) {
+  $.get( "server_command?type="+command);
+}

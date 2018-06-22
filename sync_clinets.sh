@@ -13,6 +13,7 @@ FLAGS="-avh --delete"
 FUPATH=~/dev/fugara_revelation 
 
 clients=( rev1.local rev2.local rev3.local rev4.local rev5.local rev6.local rev7.local)
+# clients=( rev4.local )
 
 #--- end config
 
@@ -21,7 +22,10 @@ echo to remove password use: ssh-copy-id pi@rev4.local
 sync() {
     for i in "${clients[@]}"
     do        
-        echo rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &
+        #stop
+        ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+        #rsync
+        echo rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &        
         rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &
     done
     
@@ -34,6 +38,9 @@ sync() {
         ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract ' $counter &
 
         counter=$((counter+1))
+        
+        #start
+        ssh -o ConnectTimeout=1 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
     done
 
     wait

@@ -116,17 +116,15 @@ app.get('/status', (req, res) => {
 
 
 app.get('/server_command', (req, res) => {
-  exec('../sync_clinets.sh', (e, stdout, stderr)=> {
-    // if (e instanceof Error) {
-    //     console.error(e);
-    //     throw e;
-    // }
+  var command = req.query.type; 
+
+  exec('../sync_clinets.sh '+ command, (e, stdout, stderr)=> {        
     console.log('stdout ', stdout);
     console.log('stderr ', stderr);
   });
 
   res.json({
-    
+     msg: "launched command" 
   });
 });
 

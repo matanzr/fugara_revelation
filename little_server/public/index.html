@@ -25,17 +25,18 @@
     <div class="row">
       <div class="col-xs-4">Clients (affect all connected fans):</div>
       <div class="col-xs-8">
-          <button>Stop</button>
-          <button>Start</button>
-          <button>Reset</button>
-          <button>Sync Sequences</button>
+          <button onclick="send_command('stop')">Stop</button>
+          <button onclick="send_command('start')">Start</button>
+          <button onclick="send_command('restart')">Restart</button>
+          <button onclick="send_command('sync')">Sync Sequences</button>
+          <button onclick="send_command('git_pull')">Git pull</button>
       </div>
       
     </div>
       <div class="row">
           <div class="col-xs-4">Server:</div>
           <div class="col-xs-8">
-              <button>Download Sequences</button>      
+              <button onclick="send_command('download')">Download Sequences</button>      
           </div>
       </div>
       
