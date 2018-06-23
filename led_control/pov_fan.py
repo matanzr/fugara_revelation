@@ -84,6 +84,11 @@ class PovFan:
 
     def next_image(self):
         self.cur_column = (self.cur_column + 1) % len(self.sequence)
+        
+        # Make sure that is on even numbered image when hitting magnet
+        if magnet_synced and self.cur_column % 2 == 1:
+            self.cur_column = (self.cur_column + 1) % len(self.sequence)
+            
         self.column = self.sequence[self.cur_column]
         print "showing frame #",self.cur_column
 

@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+var fs = require('fs');
+
 var bodyParser = require('body-parser')
 const exec = require('child_process').exec;
 
@@ -8,9 +10,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', express.static('public'))
 
-
-
 var max_timeout = 30;
+
+var playlist = []
+fs.readFile('./playlist.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    playlist = JSON.parse(data);
+  }
+);
+
 var playlist = [
   { asset: "eagle", duration: 40 },
   { asset: "cube", duration: 40 },
@@ -112,6 +120,19 @@ app.get('/status', (req, res) => {
       playlist: playlist,
       online_fans: online_fans
     });
+});
+
+app.post('/update_playlist', (req,res) => {
+  playlist = req.body['playlist'];
+  for (var i =0; i< playlist.length; i++) {
+    playlist[i].duration = parseInt(playlist[i].duration)
+  }
+  console.log(playlist);
+  fs.writeFile ('./playlist.json', (JSON.stringify(playlist)), function(err) {
+    if (err) throw err;
+    console.log('complete');
+  }
+  );
 });
 
 
