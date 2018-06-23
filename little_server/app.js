@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 var fs = require('fs');
 
+SEQ_PATH = "../led_control/incoming_images/"
+
 var bodyParser = require('body-parser')
 const exec = require('child_process').exec;
 
@@ -11,6 +13,14 @@ app.use(bodyParser.json());
 app.use('/', express.static('public'))
 
 var max_timeout = 30;
+
+var dir_list = fs.readdirSync(SEQ_PATH);
+var sequences = [];
+for (var i=0; i < dir_list.length; i++) {
+  if (fs.statSync(SEQ_PATH + dir_list[i]).isDirectory()) {    
+    sequences.push(dir_list[i]);
+  }
+}
 
 var playlist = []
 fs.readFile('./playlist.json', 'utf8', function (err, data) {
@@ -146,6 +156,12 @@ app.get('/server_command', (req, res) => {
 
   res.json({
      msg: "launched command" 
+  });
+});
+
+app.get('/sequences', (req, res) => {
+  res.json({
+    list: sequences    
   });
 });
 

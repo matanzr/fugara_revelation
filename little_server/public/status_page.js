@@ -1,3 +1,5 @@
+var server_sequences = [];
+
 setInterval(function() {
   $.get( "status", function( status_data ) {
 
@@ -60,7 +62,12 @@ setInterval(function() {
         html += "<td><font color=\"red\"><a href=\"javascript:DeletePlaylistItem(" + i + ");\">Delete</a></font></td>";
       }
 
-      html += "<tr><td><input type=\"text\" id=\"new_item_asset\"></td>";
+      html += "<tr><td><select id=\"new_item_asset\">";
+      for (var i=0; i<server_sequences.length; i++) {        
+        html += " <option value=" + server_sequences[i] + ">"+ server_sequences[i] + "</option>"
+      }
+      html +="</select></td>"
+      // html += "<tr><td><input type=\"text\" id=\"new_item_asset\"></td>";
       html += "<td><input type=\"number\" id=\"new_item_duration\"></td>";
       html += "<td><a href=\"javascript:AddPlaylistItem();\">Add</a></td></tr>";
 
@@ -106,8 +113,11 @@ function DeletePlaylistItem(index) {
   $( ".server_status" ).html("wait..");
 }
 
-
-
+setInterval(function() {
+  $.get("sequences", function(data) {
+    server_sequences = data.list;
+  })
+}, 3000);
 
 //
 //
