@@ -82,7 +82,7 @@ class PovFan:
 
         print "loading took ", time.time() - start
 
-    def next_image(self):
+    def next_image(self, magnet_synced=False):
         self.cur_column = (self.cur_column + 1) % len(self.sequence)
         
         # Make sure that is on even numbered image when hitting magnet
@@ -104,6 +104,10 @@ class PovFan:
             timing["refresh_count"] = 0
 
     def play(self, length):
+        if len(self.sequence) == 0:
+            print "No sequence loaded! Cancel play"
+            return
+        
         if is_running_on_pi == False:            
             return
 
@@ -121,7 +125,7 @@ class PovFan:
             "need_swap": 0,                 # track for estimating mid-lapse image swap
             "max_lapse_time": 0.21,          # max time allowed before force swap
             "use_magnet": True,
-            "no_magnet_lapse_time": 0.17
+            "no_magnet_lapse_time": 0.3
             }
 
         print "playing sequence for ", length, "seconds"
@@ -187,9 +191,5 @@ class PovFan:
 if __name__ == "__main__":
     while 1:
         fan = PovFan()
-        # fan.load_sequence("testgif1", 1)
-        # fan.play(60)
-        # fan.load_sequence("testgif2", 1)
-        # fan.play(60)
-        fan.load_sequence("cube2", 1)
+        fan.load_sequence("senses", 1)
         fan.play(60)

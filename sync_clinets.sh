@@ -24,6 +24,12 @@ sync() {
     do        
         #stop
         ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+    done 
+
+    wait
+
+    for i in "${clients[@]}"
+    do        
         #rsync
         echo rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &        
         rsync $FLAGS --exclude='*.png' $FROM $USER@$i:$TO &
@@ -46,6 +52,46 @@ sync() {
     wait
 }
 
+sync_repo() {
+    for i in "${clients[@]}"
+    do        
+        #stop
+        ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+        
+        #rsync
+        echo rsync $FLAGS --exclude='*.png' --exclude='*.zip' --exclude='.git' ./ $USER@$i:$FUPATH &
+        rsync $FLAGS --exclude='*.png' --exclude='*.zip'  --exclude='.git' ./ $USER@$i:$FUPATH &
+    done
+    
+    wait
+
+    # counter=1
+    # for i in "${clients[@]}"    
+    # do  
+    #     #start
+    #     # ssh -o ConnectTimeout=3 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
+    # done
+
+    # wait
+}
+
+# use git remote add pi pi@revmaster.local:dev/fugara_revelation
+git_pull_local() {
+    for i in "${clients[@]}"
+    do        
+        #stop
+        ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+    done 
+
+    wait
+
+    for i in "${clients[@]}"
+    do      
+      echo ssh $USER@$i 'cd dev/fugara_revelation/led_control && git pull pi master' &
+      ssh $USER@$i 'cd dev/fugara_revelation/led_control && git pull pi master' &
+    done
+}
+
 download() {
     cd $FUPATH && python firebase_sync.py
 }
@@ -53,16 +99,16 @@ download() {
 stop() {
     for i in "${clients[@]}"
     do
-        echo ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python'&
-        ssh -o ConnectTimeout=1 -q $USER@$i 'sudo pkill -f python' &
+        echo ssh -o ConnectTimeout=1 $USER@$i 'sudo pkill -f python'&
+        ssh -o ConnectTimeout=1 $USER@$i 'sudo pkill -f python' &
     done
 }
 
 start() {
     for i in "${clients[@]}"
     do
-        echo ssh -o ConnectTimeout=1 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
-        ssh -o ConnectTimeout=1 -q $USER@$i './launcher/launcher.sh >/dev/null &' &
+        echo ssh -o ConnectTimeout=1 $USER@$i './launcher/launcher.sh >/dev/null &' &
+        ssh -o ConnectTimeout=1 $USER@$i './launcher/launcher.sh >/dev/null &' &
     done
 }
 
@@ -83,7 +129,8 @@ restart() {
 make() {
     for i in "${clients[@]}"
     do
-        ssh $USER@$i 'cd $FUPATH && make && exit' &
+        ssh $USER@$i 'cd dev/fugara_revelation/led_control/ && rm dotstar.o && rm dotstar.so' &
+        ssh $USER@$i 'cd dev/fugara_revelation/led_control/ && make && exit' &
     done
 }
 

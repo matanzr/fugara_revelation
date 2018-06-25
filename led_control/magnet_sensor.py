@@ -14,7 +14,7 @@ class MagnetButton(HoldMixin, DigitalInputDevice):
         self._prev_change = time.time()
         self.when_activated = self.on_magnet
         self.when_magnet = None
-        self.ttl = 0.2
+        self.ttl = 0.25
 
         self.last_k = deque()
     
