@@ -17,7 +17,7 @@ var max_timeout = 30;
 var dir_list = fs.readdirSync(SEQ_PATH);
 var sequences = [];
 for (var i=0; i < dir_list.length; i++) {
-  if (fs.statSync(SEQ_PATH + dir_list[i]).isDirectory()) {    
+  if (fs.statSync(SEQ_PATH + dir_list[i]).isDirectory()) {
     sequences.push(dir_list[i]);
   }
 }
@@ -93,16 +93,20 @@ app.post('/action', (req, res) => {
     }
     online_fans[fanID].state = state;
 
-
     if (current_server_state === 'fans_stopped') {
-				if (areAllAtState('idle')) {
-					current_server_state = 'fans_loading';
-          current_asset_index++;
-          if (current_asset_index >= playlist.length) {
-              current_asset_index = 0;
-          }
-          console.log("Telling fans to Load", playlist[current_asset_index] )
+	     if (areAllAtState('idle')) {
+         if(checkIfSomeAreConnected()) {
+           console.log("Waiting for new fans..")
+         } else {
+           current_server_state = 'fans_loading';
+           current_asset_index++;
+           if (current_asset_index >= playlist.length) {
+               current_asset_index = 0;
+           }
+           console.log("Telling fans to Load", playlist[current_asset_index] )
+         }
 				}
+
 				return res.json({ status: 'success', action: 'idle' });
 			}
 			else if (current_server_state === 'fans_loading') {
@@ -147,21 +151,21 @@ app.post('/update_playlist', (req,res) => {
 
 
 app.get('/server_command', (req, res) => {
-  var command = req.query.type; 
+  var command = req.query.type;
 
-  exec('../sync_clinets.sh '+ command, (e, stdout, stderr)=> {        
+  exec('../sync_clinets.sh '+ command, (e, stdout, stderr)=> {
     console.log('stdout ', stdout);
     console.log('stderr ', stderr);
   });
 
   res.json({
-     msg: "launched command" 
+     msg: "launched command"
   });
 });
 
 app.get('/sequences', (req, res) => {
   res.json({
-    list: sequences    
+    list: sequences
   });
 });
 
@@ -174,6 +178,17 @@ function areAllAtState (requiredState) {
     const fan = online_fans[fanID];
     if (fan.state !== requiredState && fan.state !== "connected") {
 			result = false;
+		}
+  }
+	return result;
+}
+
+function checkIfSomeAreConnected () {
+	let result = false;
+  for (var fanID in online_fans) {
+    const fan = online_fans[fanID];
+    if (fan.state === "connected") {
+			result = true;
 		}
   }
 	return result;
