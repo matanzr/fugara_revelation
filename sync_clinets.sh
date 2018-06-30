@@ -18,6 +18,7 @@ clients=( rev1.local rev2.local rev3.local rev4.local rev5.local rev6.local rev7
 #--- end config
 
 echo to remove password use: ssh-copy-id pi@rev4.local
+echo rsync $FLAGS --exclude='*.png' $FROM $USER
 
 sync() {
     for i in "${clients[@]}"
@@ -41,6 +42,7 @@ sync() {
     for i in "${clients[@]}"
     do
         echo ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract' $counter &
+        # ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation/led_control/incoming_images && find . -name "*.png" -delete'        
         ssh -o ConnectTimeout=1 -q $USER@$i  'cd ~/dev/fugara_revelation && python firebase_sync.py extract ' $counter &
 
         counter=$((counter+1))
@@ -112,6 +114,14 @@ start() {
     done
 }
 
+reboot() {
+    for i in "${clients[@]}"
+    do
+        echo ssh -o ConnectTimeout=1 $USER@$i 'sudo reboot' &
+        ssh -o ConnectTimeout=1 $USER@$i 'sudo reboot' &
+    done
+}
+
 git_pull() {
     for i in "${clients[@]}"
     do
@@ -147,7 +157,7 @@ ping() {
     # fi
 }
 
-if declare -f "$1" > /dev/null
+if declare -f "$1" > /dev/null/
 then
     "$@"
 

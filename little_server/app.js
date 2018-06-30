@@ -216,3 +216,10 @@ setInterval(function() {
     current_animation_starting_time;
   }
 }, 1000);
+
+
+var reboot_interval = 2 * 60 * 1000;
+
+setInterval(function() {
+  exec('../sync_clinets.sh reboot');
+}, reboot_interval);
