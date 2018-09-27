@@ -1,0 +1,30 @@
+<html>
+    <style>
+        .thumb {
+            height: 75px;
+            border: 1px solid #000;
+            margin: 10px 5px 0 0;
+        }
+    </style>
+
+    <div>
+        <input type="file" id="files" name="files[]" multiple />
+        <output id="list"></output>
+    </div>
+
+    <div style="display:block; width: 40%">
+        <p>Input: (Recommended size 400x400)</p>
+        <canvas id="canvas"  width="288" height="288"></canvas>
+    </div>
+    <div style="display:inline-block; width: 40%">
+        <button  style="display:block" onclick="download_zip()">Download</button>
+        <button  style="display:block">Upload to server</button>
+        <p>Output</p>
+        <div id="image-output"></div>        
+    </div>
+
+    <script src="jszip.min.js" ></script>
+    <script src="image_converter.js" ></script>
+    
+
+</html>

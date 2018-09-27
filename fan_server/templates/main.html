@@ -1,0 +1,41 @@
+<a href="/action/play">Play</a>
+<a href="/action/stop">Stop</a>
+
+<a href="/static/upload_site/index.html">Upload Sequence</a>
+
+<p>Current Action {{current}}</p>
+
+Sequences on disk:
+<div>
+{% for item in sequences %}
+{{item}} <br/> 
+{% endfor %}
+</div>
+
+
+<div>
+{% for item in actions %}
+{{item}} <br/> 
+{% endfor %}
+</div>
+<br/>
+
+<div>
+    <h4>Playlist</h4>
+    {% for item in playlist %}
+        {{item[0]}} ({{item[2]}}) <br/>
+
+    {% endfor %}
+</div>
+
+
+
+<form method=post action="/playlist/add" enctype=multipart/form-data>
+    <select name=seq>
+        {% for item in sequences %}
+            <option value="{{item}}">{{item}}</option>
+        {% endfor %}
+    </select>
+    length: <input type=number name=length value="30">
+    <input type=submit value=Add>
+  </form>
