@@ -27,6 +27,8 @@ class PovFan:
         self.sequence = []
         self.cur_column = 0
 
+        self.images_folder = ""
+
         if is_running_on_pi:
             self.strip = Adafruit_DotStar(0, datapin, clockpin, 18500000)            
         else:
@@ -73,7 +75,7 @@ class PovFan:
             # print "load_sequence: ", sequence_path, fan_id
             return
         start = time.time()
-        path = os.path.join('incoming_images', sequence_path, "fan_"+str(fan_id))
+        path = os.path.join(self.images_folder, 'incoming_images', sequence_path, "fan_"+str(fan_id))
         files = sorted( glob.glob( os.path.join(path, "*.png") ))
         
         for i in range(len(files)):
