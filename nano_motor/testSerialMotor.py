@@ -1,14 +1,29 @@
 import serial
 import time
 
-increment = 10
+increment = 20
 
 asd = serial.Serial('/dev/ttyUSB0', 9600)
-while True:
-    speed = int (asd.readline())
-    print "reading pmw speed:" + speed
 
-    if speed + increment > 1800 or speed + increment < 1200:
-        increment = -increment
-    
-    asd.write(str(speed+increment))
+time.sleep(3)
+print asd.write('1\r\n')
+# asd.flush()
+
+speed = int(asd.readline())
+print "reading pmw speed:" + str(speed)     
+
+print asd.write('1800\r\n')
+
+time.sleep(5)
+
+print asd.write('1200\r\n')
+
+time.sleep(5)
+
+print asd.write('1800\r\n')
+
+print asd.write('1\r\n')
+asd.flush()
+speed = int(asd.readline())
+print "reading pmw? speed:" + str(speed)     
+print speed           
