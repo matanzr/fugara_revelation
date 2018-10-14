@@ -23,7 +23,7 @@ class MagnetButton(HoldMixin, DigitalInputDevice):
 
     def on_magnet(self, btn):
         self.last_k.append(self._last_changed - self._prev_change)
-        if (len(self.last_k) > 9):
+        if (len(self.last_k) > 5):
             self.last_k.popleft()
         self._prev_change = time.time()
 
