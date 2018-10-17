@@ -9,6 +9,7 @@ from pov_fan import PovFan
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "./uploads"
+app.config['FAN_PARENT_FOLDER'] = "../led_control/"
 app.config['FAN_SEQUENCE_FOLDER'] = "../led_control/incoming_images"
 
 
@@ -19,21 +20,28 @@ current_action = [None]
 playlist = playlist.Playlist()
 
 def worker():
-    while True:
-        item = action_q.get()
-        current_action[0] = item
+    last_action = None
+    
+    while True:        
+        try:
+            last_action = action_q.get(False, 1)
+            print "Got new action: ", last_action
+        except Queue.Empty:
+            pass
+        
+        if last_action is None: continue
+            
+        elif last_action == "play":
+            current_track = playlist.getTrack()
 
-        current_track = playlist.getTrack()
+            pov_fan = PovFan()
+            pov_fan.images_folder = app.config['FAN_PARENT_FOLDER']        
+            print "load sequence ", current_track[0]                
+            pov_fan.load_sequence(current_track[0], 1)
+            print "play sequence ", current_track[2]
+            pov_fan.play(float(current_track[2]))
 
-        pov_fan = PovFan()
-        pov_fan.images_folder = app.config['FAN_SEQUENCE_FOLDER']
-        print "load sequence ", current_track[0]
-        pov_fan.load_sequence(current_track[0], 1)
-        print "play sequence ", current_track[2]
-        pov_fan.play(current_track[2])
-
-        playlist.nextTrack()
-        action_q.task_done()
+            playlist.nextTrack()        
 
 t = threading.Thread(target=worker)
 t.daemon = True
