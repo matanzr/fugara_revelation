@@ -11,13 +11,15 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "./uploads"
 app.config['FAN_PARENT_FOLDER'] = "../led_control/"
 app.config['FAN_SEQUENCE_FOLDER'] = "../led_control/incoming_images"
+app.config['PLAYLIST_FILE'] = 'playlist.json'
 
 
 action_q = Queue.Queue()
 response_q = Queue.Queue()
-current_action = [None]
+current_action = ["stop"] # used to communicate main thraed what is worker currently doing
 
 playlist = playlist.Playlist()
+playlist.load(app.config['PLAYLIST_FILE'])
 
 def worker():
     last_action = None
@@ -25,6 +27,7 @@ def worker():
     while True:        
         try:
             last_action = action_q.get(False, 1)
+            current_action[0] = last_action
             print "Got new action: ", last_action
         except Queue.Empty:
             pass
@@ -81,9 +84,9 @@ def main_page():
             sequence_list.append(seq)
 
     return render_template('main.html', actions=action_list,
-                                        current=current_action[0],
+                                        current_action=current_action[0],
                                         sequences=sequence_list,
-                                        playlist=playlist.list)
+                                        playlist=playlist)
 
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
@@ -124,6 +127,13 @@ def upload():
 @app.route("/playlist/add", methods=['POST'])
 def playlist_add():
     playlist.add(request.form['seq'], 1, request.form['length'])
+    playlist.save(app.config['PLAYLIST_FILE'])
+    return redirect('/')
+
+@app.route("/playlist/remove/<index>")
+def playlist_remove(index):
+    playlist.remove(int(index))
+    playlist.save(app.config['PLAYLIST_FILE'])
     return redirect('/')
 
 @app.route("/action/<action>")

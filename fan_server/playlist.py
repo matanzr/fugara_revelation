@@ -1,4 +1,7 @@
-class Playlist:
+import json
+import os
+
+class Playlist:    
     def __init__(self):
         self.list = []
         self.current_track = 0
@@ -17,3 +20,17 @@ class Playlist:
    
     def remove(self, index):
         self.list.pop(index)
+
+    def load(self, file):
+        if not os.path.exists(file):
+            return
+
+        with open(file) as f:
+            self.list = json.load(f)
+
+        print "Playlist loaded from ", file
+        print "Playlist contains ", len(self.list), "sequences"
+        
+    def save(self, file):
+        with open(file, 'w') as outfile:
+            json.dump(self.list, outfile)

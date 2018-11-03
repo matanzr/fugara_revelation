@@ -1,17 +1,32 @@
+<head>
+    <style>
+        table {
+            width: 80%;
+            margin: auto;
+        }
+        td, th {
+            border: 1px solid gray;
+            padding: 8px;
+        }
+
+        tr.selected {
+            background-color:cornflowerblue;
+        }
+        tr.selected.stopped {
+            background-color:coral;
+        }
+    </style>
+</head>
+
+<h2> Fan Controls</h2>
+<h4> </h4>
 <a href="/action/play">Play</a>
 <a href="/action/stop">Stop</a>
 
 <a href="/static/upload_site/index.html">Upload Sequence</a>
 
-<p>Current Action {{current}}</p>
-
-Sequences on disk:
-<div>
-{% for item in sequences %}
-{{item}} <br/> 
-{% endfor %}
-</div>
-
+<p>Current Action <strong>{{current_action}}</strong></p>
+<p>Next actions:</p>
 
 <div>
 {% for item in actions %}
@@ -22,20 +37,42 @@ Sequences on disk:
 
 <div>
     <h4>Playlist</h4>
-    {% for item in playlist %}
-        {{item[0]}} ({{item[2]}}) <br/>
-
-    {% endfor %}
+    <form method=post action="/playlist/add" enctype=multipart/form-data>
+        <select name=seq>
+            {% for item in sequences %}
+                <option value="{{item}}">{{item}}</option>
+            {% endfor %}
+        </select>
+        length: <input type=number name=length value="30">
+        <input type=submit value=Add>
+    </form>
+    <table>        
+        <tr>
+            <th>Sequence</th>
+            <th>Length (seconds)</th>
+            <th></th>
+        </tr>        
+        {% for item in playlist.list %}            
+            {% if playlist.current_track == loop.index0 %}
+                {% if current_action == "play" %}
+                    <tr class="selected">
+                {% else %}
+                    <tr class="selected stopped">
+                {% endif %}            
+            {% else %}
+            <tr>
+            {% endif %}            
+            <td>{{item[0]}}</td> 
+            <td>{{item[2]}}</td>
+            <td><a href="/playlist/remove/{{loop.index0}}">remove</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    
 </div>
 
-
-
-<form method=post action="/playlist/add" enctype=multipart/form-data>
-    <select name=seq>
-        {% for item in sequences %}
-            <option value="{{item}}">{{item}}</option>
-        {% endfor %}
-    </select>
-    length: <input type=number name=length value="30">
-    <input type=submit value=Add>
-  </form>
+<script>
+    setInterval(function(){
+        location = ''
+    }, 2000)
+</script>
