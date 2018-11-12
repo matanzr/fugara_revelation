@@ -92,7 +92,7 @@ class PovFan:
             self.cur_column = (self.cur_column + 1) % len(self.sequence)
             
         self.column = self.sequence[self.cur_column]
-        print "showing frame #",self.cur_column
+        # print "showing frame #",self.cur_column
 
     def no_magnet_callback(self, timing):
         timing["lapse_time"] = timing["no_magnet_lapse_time"]
@@ -127,7 +127,7 @@ class PovFan:
             "need_swap": 0,                 # track for estimating mid-lapse image swap
             "max_lapse_time": 0.21,          # max time allowed before force swap
             "use_magnet": True,
-            "no_magnet_lapse_time": 0.3
+            "no_magnet_lapse_time": 0.2
             }
 
         print "playing sequence for ", length, "seconds"
@@ -136,17 +136,18 @@ class PovFan:
                 a = timing
 
                 def magnet_cbk(m):                    
-                    if not timing["use_magnet"]: 
-                        return
-
-                    timing["lapse_time"] = m.estimated_rpm()
-                    timing["last_update"] = time.time()
-                    timing["lapses"] = timing["lapses"] + 1
-                    timing["need_swap"] = 0
-                    if timing["lapses"] % 10 == 0:
-                        print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
-                        print "lapse time", timing["lapse_time"]
-                        timing["refresh_count"] = 0
+                    print "MAGNET CBK: estimated rpm: ",m.estimated_rpm()
+                    # if not timing["use_magnet"]: 
+                    #     return
+                    
+                    # timing["lapse_time"] = m.estimated_rpm()
+                    # timing["last_update"] = time.time()
+                    # timing["lapses"] = timing["lapses"] + 1
+                    # timing["need_swap"] = 0
+                    # if timing["lapses"] % 10 == 0:
+                    #     print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
+                    #     print "lapse time", timing["lapse_time"]
+                    #     timing["refresh_count"] = 0
                 return magnet_cbk
 
             magnet = MagnetButton(16)
@@ -191,7 +192,17 @@ class PovFan:
         self.strip.close()
 
 if __name__ == "__main__":
-    while 1:
-        fan = PovFan()
-        fan.load_sequence("senses", 1)
-        fan.play(60)
+    from motor_controller import MotorController
+    mc = MotorController()
+
+    mc.connect()
+    mc.set_motor_speed(1650)
+    mc.sync_speed(5)
+
+    
+    fan = PovFan()
+    fan.load_sequence("senses", 1)
+    fan.play(30)
+
+    mc = MotorController()
+    mc.connect()

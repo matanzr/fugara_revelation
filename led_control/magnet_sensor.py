@@ -43,6 +43,10 @@ class MagnetButton(HoldMixin, DigitalInputDevice):
 
 if __name__ == "__main__":
     button = MagnetButton(16)
+    def magnet_cbk(m):
+        print "cbk:", m.estimated_rpm()
+
+    button.when_magnet = magnet_cbk
 
     while True:
         print button.last_k

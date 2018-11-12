@@ -1,4 +1,6 @@
 import Queue, threading, time, os, sys
+os.chdir("/home/pi/dev/fugara_revelation/fan_server")
+
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
 import zipfile
@@ -6,6 +8,7 @@ import playlist
 sys.path.insert(0, '../led_control')
 
 from pov_fan import PovFan
+from motor_controller import MotorController
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "./uploads"
@@ -14,12 +17,30 @@ app.config['FAN_SEQUENCE_FOLDER'] = "../led_control/incoming_images"
 app.config['PLAYLIST_FILE'] = 'playlist.json'
 
 
+
+
 action_q = Queue.Queue()
 response_q = Queue.Queue()
 current_action = ["stop"] # used to communicate main thraed what is worker currently doing
 
 playlist = playlist.Playlist()
 playlist.load(app.config['PLAYLIST_FILE'])
+
+def start_motor():
+    mc = MotorController()
+
+    mc.connect()
+    mc.set_motor_speed(1650)
+    mc.sync_speed(5)
+    return mc
+
+def stop_motor(mc):
+    if (mc):
+        mc.set_motor_speed(1500)
+    else:
+        mc = MotorController()
+        mc.connect()
+
 
 def worker():
     last_action = None
@@ -37,12 +58,16 @@ def worker():
         elif last_action == "play":
             current_track = playlist.getTrack()
 
+            mc = start_motor()
+
             pov_fan = PovFan()
             pov_fan.images_folder = app.config['FAN_PARENT_FOLDER']        
             print "load sequence ", current_track[0]                
             pov_fan.load_sequence(current_track[0], 1)
             print "play sequence ", current_track[2]
             pov_fan.play(float(current_track[2]))
+
+            stop_motor(mc)
 
             playlist.nextTrack()        
 
