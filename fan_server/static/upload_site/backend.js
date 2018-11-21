@@ -27,6 +27,34 @@ function handleZipFileUpload(e) {
   });
 }
 
+function uploadFileToFan(file) { 
+  var formData = new FormData();
+  formData.append('file', file, "test.zip")
+  formData.append('name', $("#seq-name").val())
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/upload', true);
+  xhr.onload = function(e) { 
+    $(".file-name-status").html(`בום! סיימנו!`);
+    console.log("success");
+    initConverter();
+  };
+  xhr.send(formData);
+}
+
+function handleZipFileUploadToFan(e) {
+  console.log("handlezip to fan")
+  const fanId = $(".fan-id").val();
+
+  generate_zip(function(content) {
+    const zipFileToLoad = new File([content], `fan_${fanId}.zip`, {
+      type: content.contentType,
+      lastModified: Date.now()
+    });
+    uploadFileToFan(zipFileToLoad);
+  });
+}
+
 function uploadOneFile(folder, file) {
   folder = folder.replace(/\./g, "-dot-");
   const path = `${folder}/${file.name}`;

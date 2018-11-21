@@ -1,5 +1,8 @@
 import Queue, threading, time, os, sys
-os.chdir("/home/pi/dev/fugara_revelation/fan_server")
+is_running_on_pi = os.uname()[4][:3] == 'arm'
+
+if is_running_on_pi:
+    os.chdir("/home/pi/dev/fugara_revelation/fan_server")
 
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
@@ -77,10 +80,13 @@ t.start()
 
 action_q.join()
 
-def handle_new_sequence(zipfile_path, name, id=1):
+def handle_new_sequence(zipfile_path, name, id="1"):
     zip_ref = zipfile.ZipFile(zipfile_path, 'r')
 
     dest_folder = os.path.join(app.config['FAN_SEQUENCE_FOLDER'], name, "fan_" + id)
+    if not os.path.exists(dest_folder):
+        os.makedirs(dest_folder)
+
     # clean destination folder
     for the_file in os.listdir(dest_folder):
         print the_file
@@ -91,7 +97,7 @@ def handle_new_sequence(zipfile_path, name, id=1):
         except Exception as e:
             print(e)
 
-    
+    print("Got a new sequece! extracting to ", dest_folder)
     zip_ref.extractall(dest_folder)
     zip_ref.close()
 
