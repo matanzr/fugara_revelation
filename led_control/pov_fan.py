@@ -125,7 +125,7 @@ class PovFan:
             "lapses": 0,                    # number of whole rotations (or every magnet on)
             "refresh_count": 0,             # number of columns showed
             "need_swap": 0,                 # track for estimating mid-lapse image swap
-            "max_lapse_time": 0.21,          # max time allowed before force swap
+            "max_lapse_time": 0.33,          # max time allowed before force swap
             "use_magnet": True,
             "no_magnet_lapse_time": 0.2
             }
@@ -135,19 +135,18 @@ class PovFan:
             def sync_magnet(counter):
                 a = timing
 
-                def magnet_cbk(m):                    
-                    print "MAGNET CBK: estimated rpm: ",m.estimated_rpm()
-                    # if not timing["use_magnet"]: 
-                    #     return
+                def magnet_cbk(m):                                                    
+                    if not timing["use_magnet"]: 
+                        return
                     
-                    # timing["lapse_time"] = m.estimated_rpm()
-                    # timing["last_update"] = time.time()
-                    # timing["lapses"] = timing["lapses"] + 1
-                    # timing["need_swap"] = 0
-                    # if timing["lapses"] % 10 == 0:
-                    #     print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
-                    #     print "lapse time", timing["lapse_time"]
-                    #     timing["refresh_count"] = 0
+                    timing["lapse_time"] = m.estimated_rpm()
+                    timing["last_update"] = time.time()
+                    timing["lapses"] = timing["lapses"] + 1
+                    timing["need_swap"] = 0
+                    if timing["lapses"] % 10 == 0:
+                        print "lapse ", timing["lapses"], " refresh count: ", timing["refresh_count"]
+                        print "lapse time", timing["lapse_time"]
+                        timing["refresh_count"] = 0
                 return magnet_cbk
 
             magnet = MagnetButton(16)
@@ -177,7 +176,9 @@ class PovFan:
                     c = c % self.width                    
 
                 self.strip.show(self.column[c])
-                timing["refresh_count"] = timing["refresh_count"] + 1
+                timing["refresh_count"] = timing["refresh_count"] + 1      
+                time.sleep(0.0001) 
+                
 
             magnet.close()
 
