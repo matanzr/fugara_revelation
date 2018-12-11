@@ -499,6 +499,88 @@ static void raw_write(DotStarObject *self, uint8_t *ptr, uint32_t len) {
 		turboRestore();
 	}
 }
+	
+static PyObject *rotateBuffer(DotStarObject *self, PyObject *arg) {
+	Py_buffer buf;
+	if(!PyArg_ParseTuple(arg, "s*", &buf)) return NULL;
+
+	uint8_t r_offset = 3;
+	uint8_t g_offset = 2;
+	uint8_t b_offset = 1;
+
+	uint8_t *ptr_buf = buf.buf;	
+	
+	uint8_t temp_r = *(ptr_buf + 0 + r_offset);
+	uint8_t temp_g = *(ptr_buf + 0 + g_offset);
+	uint8_t temp_b = *(ptr_buf + 0 + b_offset);
+	for (int i=0; i < buf.len/2-4; i+=4) {		
+		*(ptr_buf + i + r_offset) = *(ptr_buf + i+4 + r_offset);
+		*(ptr_buf + i + g_offset) = *(ptr_buf + i+4 + g_offset);
+		*(ptr_buf + i + b_offset) = *(ptr_buf + i+4 + b_offset);
+	}
+
+	*(ptr_buf + buf.len/2-4 + r_offset) = temp_r;
+	*(ptr_buf + buf.len/2-4 + g_offset) = temp_g;
+	*(ptr_buf + buf.len/2-4 + b_offset) = temp_b;
+
+	temp_r = *(ptr_buf + buf.len-4 + r_offset);
+	temp_g = *(ptr_buf + buf.len-4 + g_offset);
+	temp_b = *(ptr_buf + buf.len-4 + b_offset);
+
+	for (int i=buf.len-4; i >= buf.len/2; i-=4) {
+		*(ptr_buf + i + r_offset) = *(ptr_buf + i-4 + r_offset);
+		*(ptr_buf + i + g_offset) = *(ptr_buf + i-4 + g_offset);
+		*(ptr_buf + i + b_offset) = *(ptr_buf + i-4 + b_offset);
+	}
+
+	*(ptr_buf + buf.len/2 + r_offset) = temp_r;
+	*(ptr_buf + buf.len/2 + g_offset) = temp_g;
+	*(ptr_buf + buf.len/2 + b_offset) = temp_b;
+
+	PyBuffer_Release(&buf);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *pushBuffer(DotStarObject *self, PyObject *arg) {
+	Py_buffer buf;
+	Py_buffer buf_next;
+	int line_offset;
+	if(!PyArg_ParseTuple(arg, "s*|s*|i", &buf, &buf_next, &line_offset)) return NULL;
+
+	uint8_t r_offset = 3;
+	uint8_t g_offset = 2;
+	uint8_t b_offset = 1;
+
+	uint8_t *ptr_buf = buf.buf;
+	uint8_t *ptr_buf_next = buf_next.buf;
+
+	for (int i=0; i < buf.len/2-4; i+=4) {		
+		*(ptr_buf + i + r_offset) = *(ptr_buf + i+4 + r_offset);
+		*(ptr_buf + i + g_offset) = *(ptr_buf + i+4 + g_offset);
+		*(ptr_buf + i + b_offset) = *(ptr_buf + i+4 + b_offset);
+	}
+
+	for (int i=buf.len-4; i >= buf.len/2+4; i-=4) {
+		*(ptr_buf + i + r_offset) = *(ptr_buf + i-4 + r_offset);
+		*(ptr_buf + i + g_offset) = *(ptr_buf + i-4 + g_offset);
+		*(ptr_buf + i + b_offset) = *(ptr_buf + i-4 + b_offset);
+	}
+
+	*(ptr_buf + buf.len/2-4 + r_offset) = *(ptr_buf_next + line_offset*4 + r_offset);
+	*(ptr_buf + buf.len/2-4 + g_offset) = *(ptr_buf_next + line_offset*4 + g_offset);
+	*(ptr_buf + buf.len/2-4 + b_offset) = *(ptr_buf_next + line_offset*4 + b_offset);
+
+	*(ptr_buf + buf.len/2 + r_offset) = *(ptr_buf_next + buf.len - line_offset*4 + r_offset);
+	*(ptr_buf + buf.len/2 + g_offset) = *(ptr_buf_next + buf.len - line_offset*4 + g_offset);
+	*(ptr_buf + buf.len/2 + b_offset) = *(ptr_buf_next + buf.len - line_offset*4 + b_offset);
+
+
+	PyBuffer_Release(&buf_next);
+	PyBuffer_Release(&buf);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
 
 static PyObject *prepareBuffer(DotStarObject *self, PyObject *arg) {
 	if(PyTuple_Size(arg) == 5) { // Raw bytearray passed
@@ -728,6 +810,8 @@ static PyMethodDef methods[] = {
   { "getPixels"    , (PyCFunction)getPixels    , METH_NOARGS , NULL },
   { "close"        , (PyCFunction)_close       , METH_NOARGS , NULL },
   { "prepareBuffer", (PyCFunction)prepareBuffer, METH_VARARGS , NULL },
+  { "pushBuffer"   , (PyCFunction)pushBuffer, METH_VARARGS , NULL },
+  { "rotateBuffer" , (PyCFunction)rotateBuffer, METH_VARARGS , NULL },
   { NULL, NULL, 0, NULL }
 };
 
