@@ -32,10 +32,12 @@ playlist.load(app.config['PLAYLIST_FILE'])
 def start_motor():
     mc = MotorController()
 
-    mc.connect()
-    mc.set_motor_speed(1650)
-    mc.sync_speed(5)
-    return mc
+    if mc.connect():
+        mc.set_motor_speed(1650)
+        mc.sync_speed(5)
+        return mc
+    else:
+        return None
 
 def stop_motor(mc):
     if (mc):
@@ -60,19 +62,22 @@ def worker():
             
         elif last_action == "play":
             current_track = playlist.getTrack()
-
             mc = start_motor()
-
-            pov_fan = PovFan()
-            pov_fan.images_folder = app.config['FAN_PARENT_FOLDER']        
-            print "load sequence ", current_track[0]                
-            pov_fan.load_sequence(current_track[0], 1)
-            print "play sequence ", current_track[2]
-            pov_fan.play(float(current_track[2]))
-
-            stop_motor(mc)
-
-            playlist.nextTrack()        
+            if mc is not None:
+                pov_fan = PovFan()
+                pov_fan.images_folder = app.config['FAN_PARENT_FOLDER']        
+                print "load sequence ", current_track[0]                
+                pov_fan.load_sequence(current_track[0], 1)
+                print "play sequence ", current_track[2]
+                pov_fan.play(float(current_track[2]))
+                
+                stop_motor(mc)
+                playlist.nextTrack()
+            
+            else:
+                print "No motor connect.... check USB connection"
+                action_q.put("stop")
+                response_q.put("USB ERROR")                
 
 t = threading.Thread(target=worker)
 t.daemon = True
@@ -107,6 +112,7 @@ def handle_new_sequence(zipfile_path, name, id="1"):
 @app.route("/")
 def main_page():
     action_list = list(action_q.queue)
+    resoponse_list = list(response_q.queue)
 
     sequence_list = []
     for seq in os.listdir(app.config['FAN_SEQUENCE_FOLDER']):
@@ -117,7 +123,8 @@ def main_page():
     return render_template('main.html', actions=action_list,
                                         current_action=current_action[0],
                                         sequences=sequence_list,
-                                        playlist=playlist)
+                                        playlist=playlist,
+                                        responses=resoponse_list)
 
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
