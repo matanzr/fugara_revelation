@@ -3,6 +3,8 @@ import glob
 is_running_on_pi = os.uname()[4][:3] == 'arm'
 from PIL import Image
 
+PHYSICAL_ANGLE_OFFSET = 315
+
 if is_running_on_pi:
     from dotstar import Adafruit_DotStar
     from magnet_sensor import MagnetButton
@@ -34,34 +36,47 @@ class PovFan:
         else:
             self.strip = None
 
-    def add_image(self, image_path, reverse):
-        if is_running_on_pi == False:
+    def add_image(self, image1_path, image2_path):
+        if not is_running_on_pi:
             # print "add_image"
             return
-        img       = Image.open(image_path).convert("RGB")
-        pixels    = img.load()
-        width     = img.size[0]
-        height    = img.size[1]
+
+        img1       = Image.open(image1_path).convert("RGB")
+        pixels1    = img1.load()
+        width     = img1.size[0]
+        height    = img1.size[1]
+
+        img2       = Image.open(image2_path).convert("RGB")
+        pixels2    = img2.load()
 
         if (height < STRIP_LENGTH):
             assert("trying to load image too small")
 
 
-        column = [0 for x in range(width)]
-        for x in range(width):
+        column = [0 for x in range(width*2)]
+        for x in range(width*2):
             column[x] = bytearray(STRIP_LENGTH * 4)
 
-        bytess = img.tobytes()
+        bytess = img1.tobytes()
 
-        for x in range(width):
+        for x in range(width):                        
             offset = x * 3
             multiplier = width * 3
-            self.strip.prepareBuffer(column[x], bytess, offset, multiplier, reverse)
+            self.strip.prepareBuffer(column[x], bytess, offset, multiplier, False)
+        
+        bytess = img2.tobytes()
+
+        for x in range(width):                        
+            offset = x * 3
+            multiplier = width * 3
+            self.strip.prepareBuffer(column[x+width], bytess, offset, multiplier, True)
+            
 
         self.sequence.append(column)
-        self.width = width
+        self.width = width*2
 
-        img.close()
+        img1.close()
+        img2.close()
 
     def disabled_animation(): pass
     
@@ -79,8 +94,9 @@ class PovFan:
         files = sorted( glob.glob( os.path.join(path, "*.png") ))
         
         for i in range(len(files)):
-            print "loading image ", i
-            self.add_image(files[i], i%2)
+            print len(files), i+1 < len(files)
+            if i%2 == 0 and i+1 < len(files):
+                self.add_image(files[i], files[i+1])
 
         print "loading took ", time.time() - start
 
@@ -105,7 +121,7 @@ class PovFan:
             print "lapse time", timing["lapse_time"]
             timing["refresh_count"] = 0
 
-    def play(self, length):
+    def play(self, length):        
         if len(self.sequence) == 0:
             print "No sequence loaded! Cancel play"
             return
@@ -116,7 +132,10 @@ class PovFan:
         self.strip.begin()
 
         end_time = length + time.time()
-        PIXELS_IN_CIRCLE = 2 * self.width
+        PIXELS_IN_CIRCLE = self.width
+        angle_offset_pixels = (int) (PHYSICAL_ANGLE_OFFSET * 360.0 / PIXELS_IN_CIRCLE)
+        print "offsting image by " + str(angle_offset_pixels) 
+
         self.column = self.sequence[self.cur_column]        
 
         timing = {
@@ -164,13 +183,14 @@ class PovFan:
                     self.next_image()
                     timing["need_swap"] = 1
 
-                c = int(PIXELS_IN_CIRCLE * (time.time() - timing["last_update"]) / timing["lapse_time"])
+                ## Angle_offset_pixels is a temp solutions .... need to fix in actual image
+                c = angle_offset_pixels + int(PIXELS_IN_CIRCLE * (time.time() - timing["last_update"]) / timing["lapse_time"])
 
                 # TODO: make this cleaner...
                 if c >= (self.width):
-                    if timing["need_swap"] == 1:
-                        self.next_image()
-                        timing["need_swap"] = 2
+                    # if timing["need_swap"] == 1:
+                    #     self.next_image()
+                    #     timing["need_swap"] = 2
 
                     ## if overflowing since lapse is longer now
                     c = c % self.width                    
@@ -197,13 +217,14 @@ if __name__ == "__main__":
     mc = MotorController()
 
     mc.connect()
-    mc.set_motor_speed(1650)
+    mc.set_motor_speed(1700)
     mc.sync_speed(5)
 
     
     fan = PovFan()
-    fan.load_sequence("senses", 1)
-    fan.play(30)
+    # fan.load_sequence("test", 1)
+    fan.load_sequence("signs1", 1)
+    fan.play(10)
 
     mc = MotorController()
     mc.connect()
