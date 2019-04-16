@@ -11,6 +11,7 @@ import playlist
 sys.path.insert(0, '../led_control')
 
 from pov_fan import PovFan
+from pov_fan_cyclic import PovFan as PovFanCyclic
 from motor_controller import MotorController
 
 app = Flask(__name__)
@@ -33,7 +34,8 @@ def start_motor():
     mc = MotorController()
 
     if mc.connect():
-        mc.set_motor_speed(1650)
+        print "in connect"
+        mc.set_motor_speed(1700)
         mc.sync_speed(5)
         return mc
     else:
@@ -73,7 +75,20 @@ def worker():
                 
                 stop_motor(mc)
                 playlist.nextTrack()
-            
+        
+        elif last_action == "play_cyclic":
+            current_track = ["endless", "", 400]
+            mc = start_motor()
+            if mc is not None:
+                pov_fan = PovFanCyclic()
+                pov_fan.images_folder = app.config['FAN_PARENT_FOLDER']        
+                print "load sequence ", current_track[0]                
+                pov_fan.load_sequence(current_track[0], 1)
+                print "play sequence ", current_track[2]
+                pov_fan.play(float(current_track[2]))
+                
+                stop_motor(mc)
+                playlist.nextTrack()
             else:
                 print "No motor connect.... check USB connection"
                 action_q.put("stop")

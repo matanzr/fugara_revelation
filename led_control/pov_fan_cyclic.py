@@ -206,6 +206,7 @@ class PovFan:
             while end_time > timing["last_update"]:
                 timing["last_update"] = time.time()
         
+        self.strip.clear()
         self.strip.close()
 
     def stop(self):
@@ -222,7 +223,7 @@ if __name__ == "__main__":
 
     
     fan = PovFan()
-    fan.load_sequence("endless5", 1)
+    fan.load_sequence("endless", 1)
     fan.play(400)
 
     mc.stop_motor()

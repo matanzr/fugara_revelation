@@ -13,6 +13,7 @@ class MotorController:
         self.asd = serial.Serial('/dev/ttyUSB0', 9600)
         time.sleep(3)
         print "Connected to motor"
+        return True
 
 
     def set_motor_speed(self, speed):

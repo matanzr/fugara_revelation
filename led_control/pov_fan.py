@@ -3,7 +3,7 @@ import glob
 is_running_on_pi = os.uname()[4][:3] == 'arm'
 from PIL import Image
 
-PHYSICAL_ANGLE_OFFSET = 315
+PHYSICAL_ANGLE_OFFSET = 100
 
 if is_running_on_pi:
     from dotstar import Adafruit_DotStar
@@ -94,7 +94,7 @@ class PovFan:
         files = sorted( glob.glob( os.path.join(path, "*.png") ))
         
         for i in range(len(files)):
-            print len(files), i+1 < len(files)
+            print "load images ", i, i+1
             if i%2 == 0 and i+1 < len(files):
                 self.add_image(files[i], files[i+1])
 
@@ -206,6 +206,10 @@ class PovFan:
             while end_time > timing["last_update"]:
                 timing["last_update"] = time.time()
         
+        
+        
+        self.strip.show(bytearray(STRIP_LENGTH * 4))
+        
         self.strip.close()
 
     def stop(self):
@@ -216,15 +220,15 @@ if __name__ == "__main__":
     from motor_controller import MotorController
     mc = MotorController()
 
-    mc.connect()
-    mc.set_motor_speed(1700)
-    mc.sync_speed(5)
+    # mc.connect()
+    # mc.set_motor_speed(1700)
+    # mc.sync_speed(5)
 
     
     fan = PovFan()
     # fan.load_sequence("test", 1)
     fan.load_sequence("signs1", 1)
-    fan.play(10)
+    fan.play(3)
 
-    mc = MotorController()
-    mc.connect()
+    # mc = MotorController()
+    # mc.connect()
