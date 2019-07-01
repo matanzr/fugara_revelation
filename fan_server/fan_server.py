@@ -8,19 +8,20 @@ from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
 import zipfile
 import playlist
+import scheduler
 sys.path.insert(0, '../led_control')
 
 from pov_fan import PovFan
 from pov_fan_cyclic import PovFan as PovFanCyclic
-from motor_controller import MotorController
+if is_running_on_pi:
+    from motor_controller import MotorController
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "./uploads"
 app.config['FAN_PARENT_FOLDER'] = "../led_control/"
 app.config['FAN_SEQUENCE_FOLDER'] = "../led_control/incoming_images"
 app.config['PLAYLIST_FILE'] = 'playlist.json'
-
-
+app.config['SCHEDULER_FILE'] = 'scheduler.json'
 
 
 action_q = Queue.Queue()
@@ -29,6 +30,9 @@ current_action = ["stop"] # used to communicate main thraed what is worker curre
 
 playlist = playlist.Playlist()
 playlist.load(app.config['PLAYLIST_FILE'])
+
+schedule = scheduler.Scheduler()
+schedule.load(app.config['SCHEDULER_FILE'])
 
 def start_motor():
     mc = MotorController()
@@ -53,6 +57,11 @@ def worker():
     last_action = None
     
     while True:        
+        time.sleep(1)
+
+        scheduled_task = schedule.isActive() 
+        if scheduled_task:
+            action_q.put(scheduled_task)
         try:
             last_action = action_q.get(False, 1)
             current_action[0] = last_action
@@ -61,6 +70,8 @@ def worker():
             pass
         
         if last_action is None: continue
+
+        if not is_running_on_pi: continue
             
         elif last_action == "play":
             current_track = playlist.getTrack()
@@ -139,7 +150,8 @@ def main_page():
                                         current_action=current_action[0],
                                         sequences=sequence_list,
                                         playlist=playlist,
-                                        responses=resoponse_list)
+                                        responses=resoponse_list,
+                                        schedule=schedule)
 
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
@@ -182,11 +194,24 @@ def playlist_add():
     playlist.add(request.form['seq'], 1, request.form['length'])
     playlist.save(app.config['PLAYLIST_FILE'])
     return redirect('/')
-
+    
 @app.route("/playlist/remove/<index>")
 def playlist_remove(index):
     playlist.remove(int(index))
     playlist.save(app.config['PLAYLIST_FILE'])
+    return redirect('/')
+
+
+@app.route("/schedule/remove/<index>")
+def schedule_remove(index):
+    schedule.remove(int(index))
+    schedule.save(app.config['SCHEDULER_FILE'])
+    return redirect('/')
+
+@app.route("/schedule/add", methods=['POST'])
+def schedule_add():
+    schedule.add(request.form['schedule'], int(request.form['length']))
+    schedule.save(app.config['SCHEDULER_FILE'])
     return redirect('/')
 
 @app.route("/action/<action>")

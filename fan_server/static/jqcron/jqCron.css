@@ -102,10 +102,10 @@
 	color: red;
 }
 .jqCron-container.disable * {
-	color: #888;
+	color: rgb(0,0,0);
 }
 .jqCron-container.disable .jqCron-selector-title {
-	background: #eee !important;
+	background: rgb(210, 249, 208) !important;
 }
 
 

@@ -45,7 +45,33 @@
             <a class="btn btn-success btn-lg" href="/action/play_cyclic">Play Cyclic</a>
         {% endif %}        
         
-        <div class="scheduler"></div>
+        <div id="schedule">
+            
+
+            <table>        
+                <tr>
+                    <th>Scheduled</th>
+                    <th>Action</th>
+                    <th></th>
+                </tr>        
+                {% for item in schedule.list %}            
+                    <tr>
+                    <td> <input class="cronTime" value="{{item[0]}}" hidden="true"/></td> 
+                    <td> Play - 15 minutes</td>
+                    <td><a href="/schedule/remove/{{loop.index0}}">remove</a></td>                
+                    </tr>
+                {% endfor %}
+               
+            </table>
+            <form method=post action="/schedule/add" enctype=multipart/form-data>
+                <div class="scheduler"></div>
+                <input id="schedule_val" value="" name="schedule" hidden=true/>
+                length: <input type=number name=length value="15"> minutes
+                <input type=submit value=Add>
+            </form>
+        </div>
+        
+
         <div class="mt-3">
             <p>Current Status <strong>{{current_action}}</strong></p>
             <p>Next actions:</p>
