@@ -71,7 +71,7 @@ class PovFan:
             multiplier = width * 3
             self.strip.prepareBuffer(column[x+width], bytess, offset, multiplier, True)
             
-
+        column.reverse()
         self.sequence.append(column)
         self.width = width*2
 
@@ -220,15 +220,16 @@ if __name__ == "__main__":
     from motor_controller import MotorController
     mc = MotorController()
 
-    # mc.connect()
+    mc.connect()
     # mc.set_motor_speed(1700)
     # mc.sync_speed(5)
 
     
     fan = PovFan()
     # fan.load_sequence("test", 1)
-    fan.load_sequence("signs1", 1)
-    fan.play(3)
+    fan.load_sequence("shburit", 1)
+    fan.play(5)
 
+    # mc.set_motor_speed(1600)
     # mc = MotorController()
     # mc.connect()
